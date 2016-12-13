@@ -9,6 +9,7 @@ require 'Qt'
 class MyWidget < Qt::Widget
   def initialize(parent = nil)
     super
+    p self
     @app = Qt::Application.new(ARGV)
     setFixedSize(200, 120)
 

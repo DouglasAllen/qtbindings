@@ -11,6 +11,7 @@ require 'lcdrange.rb'
 class MyWidget < Qt::Widget
   def initialize(parent = nil)
     super(parent)
+    @app = Qt::Application.new(ARGV)
     quit_button
     grid
     layout
@@ -19,7 +20,7 @@ class MyWidget < Qt::Widget
   def quit_button
     @quit = Qt::PushButton.new('Quit')
     @quit.setFont(Qt::Font.new('Times', 18, Qt::Font::Bold))
-    connect(@quit, SIGNAL('clicked()'), self, SLOT('quit()'))
+    connect(@quit, SIGNAL('clicked()'), @app, SLOT('quit()'))
   end
 
   def grid

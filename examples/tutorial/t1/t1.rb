@@ -1,6 +1,7 @@
 
 # !/usr/bin/env ruby
-$VERBOSE = true; $LOAD_PATH.unshift File.dirname($PROGRAM_NAME)
+$VERBOSE = true
+$LOAD_PATH.unshift File.dirname($PROGRAM_NAME)
 
 require 'Qt'
 
