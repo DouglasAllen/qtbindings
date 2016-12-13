@@ -1,11 +1,13 @@
-#!/usr/bin/env ruby
-$VERBOSE = true; $:.unshift File.dirname($0)
+
+# !/usr/bin/env ruby
+$VERBOSE = true
+$LOAD_PATH.unshift File.dirname($PROGRAM_NAME)
 
 require 'Qt'
 
+#
 class LCDRange < Qt::Widget
-
-def initialize(parent = nil)
+  def initialize(parent = nil)
     super
     lcd = Qt::LCDNumber.new(2)
     slider = Qt::Slider.new(Qt::Horizontal)
@@ -18,33 +20,41 @@ def initialize(parent = nil)
     layout.addWidget(lcd)
     layout.addWidget(slider)
     setLayout(layout)
+  end
 end
 
-end
-
+#
 class MyWidget < Qt::Widget
-
-def initialize()
+  def initialize
     super
-    quit = Qt::PushButton.new('Quit')
-    quit.setFont(Qt::Font.new('Times', 18, Qt::Font::Bold))
-    connect(quit, SIGNAL('clicked()'), $qApp, SLOT('quit()'))
+    @app = Qt::Application.new(ARGV)
+    quit_button
+    grid
+    layout
+  end
 
-    grid = Qt::GridLayout.new
-	
-    for row in 0..3
-        for column in 0..3
-            grid.addWidget(LCDRange.new, row, column)
-        end
+  def quit_button
+    @quit = Qt::PushButton.new('Quit')
+    @quit.setFont(Qt::Font.new('Times', 18, Qt::Font::Bold))
+    connect(@quit, SIGNAL('clicked()'), @app, SLOT('quit()'))
+  end
+
+  def grid
+    @grid = Qt::GridLayout.new
+    (0..3).each do |row|
+      (0..3).each do |column|
+        @grid.addWidget(LCDRange.new, row, column)
+      end
     end
+  end
 
+  def layout
     layout = Qt::VBoxLayout.new
-    layout.addWidget(quit)
-    layout.addLayout(grid)
+    layout.addWidget(@quit)
+    layout.addLayout(@grid)
     setLayout(layout)
+  end
 end
-
-end    
 
 app = Qt::Application.new(ARGV)
 widget = MyWidget.new

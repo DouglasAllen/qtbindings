@@ -1,14 +1,19 @@
-windows = false
-processor, platform, *rest = RUBY_PLATFORM.split("-")
-windows = true if platform == 'mswin32' or platform == 'mingw32'
 
-files = Dir["**/main.rb"]
+windows = false
+processor, platform, *rest = RUBY_PLATFORM.split('-')
+windows = true if (platform == 'mswin32') || (platform == 'mingw32')
+
+files = Dir['**/main.rb']
 files.each do |file|
   if windows
     next if file.include?('qdbus') # because qdbus is Unix only
-    command = "cd #{File.dirname(file).gsub('/', '\\')} && ruby -rubygems #{File.basename(file)}"
+    command =
+      "cd #{File.dirname(file).tr('/', '\\')} &&
+      ruby -rubygems #{File.basename(file)}"
   else
-    command = "cd #{File.dirname(file)} && ruby -rubygems #{File.basename(file)}"
+    command =
+      "cd #{File.dirname(file)} &&
+      ruby -rubygems #{File.basename(file)}"
   end
   puts "running: #{command}"
   system(command)

@@ -1,5 +1,7 @@
-#!/usr/bin/env ruby
-$VERBOSE = true; $:.unshift File.dirname($0)
+
+# !/usr/bin/env ruby
+$VERBOSE = true
+$LOAD_PATH.unshift File.dirname($PROGRAM_NAME)
 
 require 'Qt'
 
@@ -15,4 +17,3 @@ app.connect(quit, SIGNAL('clicked()'), app, SLOT('quit()'))
 
 window.show
 app.exec
-

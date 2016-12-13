@@ -1,7 +1,9 @@
-#!/usr/bin/env ruby
-$VERBOSE = true; $:.unshift File.dirname($0)
 
-require 'Qt';
+# !/usr/bin/env ruby
+$VERBOSE = true
+$LOAD_PATH.unshift File.dirname($PROGRAM_NAME)
+
+require 'Qt'
 
 a = Qt::Application.new(ARGV)
 

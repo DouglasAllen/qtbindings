@@ -1,34 +1,46 @@
-#!/usr/bin/env ruby
-$VERBOSE = true; $:.unshift File.dirname($0)
+
+# !/usr/bin/env ruby
+$VERBOSE = true
+$LOAD_PATH.unshift File.dirname($PROGRAM_NAME)
 
 require 'Qt'
 
+#
 class MyWidget < Qt::Widget
-
-def initialize()
+  def initialize
     super
-    quit = Qt::PushButton.new('Quit')
-    quit.setFont(Qt::Font.new('Times', 18, Qt::Font::Bold))
-    
-    connect(quit, SIGNAL('clicked()'), $qApp, SLOT('quit()'))
-    
-    lcd = Qt::LCDNumber.new(2)
+    @app = Qt::Application.new(ARGV)
+    quit_button
+    lcd_display
+    slider_control
+    layout
+  end
 
-    slider = Qt::Slider.new(Qt::Horizontal)
-    slider.range = 0..99
-    slider.value = 0
+  def quit_button
+    @quit = Qt::PushButton.new('Quit')
+    @quit.setFont(Qt::Font.new('Times', 18, Qt::Font::Bold))
+    connect(@quit, SIGNAL('clicked()'), @app, SLOT('quit()'))
+  end
 
-    connect(quit, SIGNAL('clicked()'), $qApp, SLOT('quit()'))
-    connect(slider, SIGNAL('valueChanged(int)'),
-            lcd, SLOT('display(int)'))
+  def lcd_display
+    @lcd = Qt::LCDNumber.new(2)
+  end
 
-    layout = Qt::VBoxLayout.new
-    layout.addWidget(quit)
-    layout.addWidget(lcd)
-    layout.addWidget(slider)
-    setLayout(layout)
-end
+  def slider_control
+    @slider = Qt::Slider.new(Qt::Horizontal)
+    @slider.range = 0..99
+    @slider.value = 0
+    connect(@slider, SIGNAL('valueChanged(int)'),
+            @lcd, SLOT('display(int)'))
+  end
 
+  def layout
+    @layout = Qt::VBoxLayout.new
+    @layout.addWidget(@quit)
+    @layout.addWidget(@lcd)
+    @layout.addWidget(@slider)
+    setLayout(@layout)
+  end
 end
 
 app = Qt::Application.new(ARGV)
