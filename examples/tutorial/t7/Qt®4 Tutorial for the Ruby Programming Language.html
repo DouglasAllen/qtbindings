@@ -1,0 +1,189 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!-- saved from url=(0063)https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_07 -->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><head profile="http://www.w3.org/2005/10/profile"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Qt®4 Tutorial for the Ruby Programming Language</title>
+
+<link rel="stylesheet" href="./Qt®4 Tutorial for the Ruby Programming Language_files/default.css" type="text/css">
+<link rel="icon" type="image/png" href="https://www.darshancomputing.com/favicon.png">
+<!-- google_ad_section_start(weight=ignore) -->
+<link rel="start" href="https://www.darshancomputing.com/qt4-qtruby-tutorial/">
+<link rel="next" href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_08">
+<link rel="prev" href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_06">
+<!-- google_ad_section_end -->
+</head>
+<body>
+<div class="page">
+<!-- google_ad_section_start(weight=ignore) -->
+<div class="navPrev">&nbsp;[Prev: <a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_06">Chapter 6</a>]</div>
+<div class="navContents">&nbsp;[<a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/">Contents</a>]&nbsp;</div>
+<div class="navNext">[Next: <a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_08">Chapter 8</a>]&nbsp;</div>
+<!-- google_ad_section_end -->
+<div class="content">
+<h1 class="title">Qt<sup>®</sup>4 Tutorial for the Ruby <br>Programming Language</h1>
+<!-- google_ad_section_start(weight=ignore) --><h2 class="subtitle">Chapter 7: One Thing Leads to Another</h2><!-- google_ad_section_end -->
+<div class="center"><img src="./Qt®4 Tutorial for the Ruby Programming Language_files/t7.png" alt="Screenshot: One Thing Leads to Another" width="348" height="295"></div>
+<br>
+Files:
+<ul>
+<li><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/tutorial/t7/lcdrange.rb">lcdrange.rb</a></li>
+<li><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/tutorial/t7/t7.rb">t7.rb</a></li>
+</ul>
+<h3>Overview</h3>
+
+<p>
+This example shows how to create custom widgets with signals and slots, 
+and how to connect them together in more complex ways. 
+For the first time, the source is split among several files.
+</p>
+
+<h3>Line by Line Walkthrough</h3>
+
+<h4><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/tutorial/t7/lcdrange.rb">lcdrange.rb</a></h4>
+
+<p>
+This file is mainly lifted from Chapter 6; only the non-trivial changes are noted here.
+</p>
+
+<pre class="code">  signals 'valueChanged(int)'
+  slots 'setValue(int)'
+</pre>
+
+<pre class="code">  def value()
+    @slider.value()
+  end
+
+  def setValue(value)
+    @slider.setValue(value)
+  end
+</pre>
+
+<p>
+These make up an interface between this widget and other components in a program. 
+Until now, <code>LCDRange</code> didn't really have an API at all.
+</p>
+
+<p>
+<code>value()</code> is a public function for accessing the value of the <code>LCDRange</code>, 
+<code>setValue()</code> is our first custom slot, 
+and <code>valueChanged()</code> is our first custom signal.
+</p>
+
+<p>
+Slots must be implemented in the normal way (a slot is also a Ruby member function).
+Signals are automatically implemented. 
+Signals follow the access rules of protected Ruby functions 
+(i.e., they can be emitted only by the class they are defined in or by classes inheriting from it).
+</p>
+
+<p>
+The <code>valueChanged()</code> signal is used when the <code>LCDRange's</code> value has changed.
+</p>
+
+<p>
+The implementation of <code>value()</code> is straightforward. It simply returns the slider's value.
+</p>
+
+<p>
+The implementation of <code>setValue()</code> is equally straightforward. 
+Note that because the slider and LCD number are connected, 
+setting the slider's value automatically updates the LCD number as well. 
+In addition, the slider will automatically adjust the value if it is outside its legal range.
+</p>
+
+<pre class="code">    connect(@slider, SIGNAL('valueChanged(int)'),
+            lcd, SLOT('display(int)'))
+    connect(@slider, SIGNAL('valueChanged(int)'),
+            self, SIGNAL('valueChanged(int)'))
+</pre>
+
+<p>
+The first <a href="http://doc.trolltech.com/4.2/qobject.html#connect">QObject::connect()</a> call is the same that you have seen in the previous chapter. 
+The second is new; it connects slider's <a href="http://doc.trolltech.com/4.2/qabstractslider.html#valueChanged">QAbstractSlider::valueChanged()</a> signal to this object's <code>valueChanged()</code> signal. 
+Yes, that's right. Signals can be connected to other signals. 
+When the first is emitted, the second signal is also emitted.
+</p>
+
+<p>
+Let's look at what happens when the user operates the slider. 
+The slider sees that its value has changed and emits the <a href="http://doc.trolltech.com/4.2/qabstractslider.html#valueChanged">QAbstractSlider::valueChanged()</a> signal. 
+That signal is connected both to the <a href="http://doc.trolltech.com/4.2/qlcdnumber.html#intValue-prop">QLCDNumber::display()</a> slot of the <a href="http://doc.trolltech.com/4.2/qlcdnumber.html">Qt::LCDNumber</a> and 
+to the <code>valueChanged()</code> signal of the <code>LCDRange</code>.
+</p>
+
+<p>
+Thus, when the signal is emitted, <code>LCDRange</code> emits its own <code>valueChanged()</code> signal. 
+In addition, <a href="http://doc.trolltech.com/4.2/qlcdnumber.html#intValue-prop">Qt::LCDNumber::display()</a> is called and shows the new number.
+</p>
+
+<p>
+Note that you're not guaranteed any particular order of execution; <code>LCDRange::valueChanged()</code>
+ may be emitted before or after <a href="http://doc.trolltech.com/4.2/qlcdnumber.html#intValue-prop">Qt::LCDNumber::display()</a> is called.
+</p>
+
+<h4><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/tutorial/t7/t7.rb">t7.rb</a></h4>
+
+<pre class="code">    previousRange = nil
+
+    for row in 0..2
+      for column in 0..2
+        lcdRange = LCDRange.new()
+        grid.addWidget(lcdRange, row, column)
+        unless previousRange.nil?
+          connect(lcdRange, SIGNAL('valueChanged(int)'),
+                  previousRange, SLOT('setValue(int)'))
+        end
+        previousRange = lcdRange
+      end
+    end
+</pre>
+
+<p>
+When we create the nine <code>LCDRange</code> objects, we connect them using 
+the <a href="http://doc.trolltech.com/4.2/signalsandslots.html">signals and slots</a> mechanism. 
+Each has its <code>valueChanged()</code> signal connected to the previous one's 
+<code>setValue()</code> slot. Because <code>LCDRange</code> emits the <code>valueChanged()</code> 
+signal when its value changes, we are here creating a chain of signals and slots.
+</p>
+
+<h3>Running the Application</h3>
+
+<p>
+On startup, the program's appearance is identical to the previous one. Try operating the slider to the bottom-right.
+</p>
+
+<!-- google_ad_section_start(weight=ignore) --><h3>Exercises</h3><!-- google_ad_section_end -->
+
+<p>
+Use the bottom-right slider to set all LCDs to 50.
+Then set all but the last LCD to 40 by clicking once to the left of the bottom-middle slider handle. 
+Now, use the bottom-left slider to set the first seven LCDs back to 50.
+</p>
+
+<p>
+Click to the left of the handle on the bottom-right slider. What happens? Why is this the correct behavior?
+</p>
+</div>
+<!-- google_ad_section_start(weight=ignore) -->
+<div class="navPrev">&nbsp;[Prev: <a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_06">Chapter 6</a>]</div>
+<div class="navContents">&nbsp;[<a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/">Contents</a>]&nbsp;</div>
+<div class="navNext">[Next: <a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_08">Chapter 8</a>]&nbsp;</div>
+<!-- google_ad_section_end -->
+<!-- google_ad_section_start(weight=ignore) -->
+<hr><div class="legal_link"><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/legal">Legal Notice</a>&nbsp;</div>
+<div class="contact_link"><a href="mailto:qt-tutorial@darshancomputing.com">Contact Me</a></div>
+<!-- google_ad_section_end -->
+<div class="force_clear"></div>
+</div>
+
+<p style="clear: both">
+</p><p style="margin-bottom: 0px;">
+  <a href="http://validator.w3.org/check?uri=referer"><img src="./Qt®4 Tutorial for the Ruby Programming Language_files/valid-xhtml10.png" alt="Valid XHTML 1.0!" height="31" width="88"></a>
+  <a href="http://jigsaw.w3.org/css-validator/check/referer"><img src="./Qt®4 Tutorial for the Ruby Programming Language_files/vcss.png" alt="Valid CSS!" height="31" width="88"></a>
+</p>
+
+<p style="margin-top: 10px; margin-bottom: 0px;">
+This page was last generated Sun Dec 03 14:40:27 -0800 2006
+</p>
+<script type="text/javascript">/* <![CDATA[ */(function(d,s,a,i,j,r,l,m,t){try{l=d.getElementsByTagName('a');t=d.createElement('textarea');for(i=0;l.length-i;i++){try{a=l[i].href;s=a.indexOf('/cdn-cgi/l/email-protection');m=a.length;if(a&&s>-1&&m>28){j=28+s;s='';if(j<m){r='0x'+a.substr(j,2)|0;for(j+=2;j<m&&a.charAt(j)!='X';j+=2)s+='%'+('0'+('0x'+a.substr(j,2)^r).toString(16)).slice(-2);j++;s=decodeURIComponent(s)+a.substr(j,m-j)}t.innerHTML=s.replace(/</g,'&lt;').replace(/>/g,'&gt;');l[i].href='mailto:'+t.value}}catch(e){}}}catch(e){}})(document);/* ]]> */</script>
+
+</body></html>

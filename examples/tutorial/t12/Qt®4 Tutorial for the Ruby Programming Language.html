@@ -1,0 +1,338 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!-- saved from url=(0063)https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_12 -->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><head profile="http://www.w3.org/2005/10/profile"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Qt®4 Tutorial for the Ruby Programming Language</title>
+
+<link rel="stylesheet" href="./Qt®4 Tutorial for the Ruby Programming Language_files/default.css" type="text/css">
+<link rel="icon" type="image/png" href="https://www.darshancomputing.com/favicon.png">
+<!-- google_ad_section_start(weight=ignore) -->
+<link rel="start" href="https://www.darshancomputing.com/qt4-qtruby-tutorial/">
+<link rel="next" href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_13">
+<link rel="prev" href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_11">
+<!-- google_ad_section_end -->
+</head>
+<body>
+<div class="page">
+<!-- google_ad_section_start(weight=ignore) -->
+<div class="navPrev">&nbsp;[Prev: <a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_11">Chapter 11</a>]</div>
+<div class="navContents">&nbsp;[<a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/">Contents</a>]&nbsp;</div>
+<div class="navNext">[Next: <a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_13">Chapter 13</a>]&nbsp;</div>
+<!-- google_ad_section_end -->
+<div class="content">
+<h1 class="title">Qt<sup>®</sup>4 Tutorial for the Ruby <br>Programming Language</h1>
+<!-- google_ad_section_start(weight=ignore) --><h2 class="subtitle">Chapter 12: Hanging in the Air the Way Bricks Don't</h2><!-- google_ad_section_end -->
+<div class="center"><img src="./Qt®4 Tutorial for the Ruby Programming Language_files/t12.png" alt="Screenshot: Hanging in the Air the Way Bricks Don&#39;t" width="508" height="386"></div>
+<br>
+Files:
+<ul>
+<li><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/tutorial/t12/t12.rb">t12.rb</a></li>
+<li><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/tutorial/t12/cannon.rb">cannon.rb</a></li>
+<li><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/tutorial/t12/lcdrange.rb">lcdrange.rb</a></li>
+</ul>
+<h3>Overview</h3>
+
+<p>
+In this example, we extend our <code>LCDRange</code> class to include a text label.
+We also provide something to shoot at.
+</p>
+
+<h3>Line by Line Walkthrough</h3>
+
+<h4><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/tutorial/t12/lcdrange.rb">lcdrange.rb</a></h4>
+
+<pre class="code">  def initialize(s, parent = nil)
+    super(parent)
+    init()
+    setText(s)
+  end
+</pre>
+
+<p>
+This constructor first calls <code>init()</code> and then sets the label text.
+<code>init()</code> is a separate function performing initialization mosty because
+of function overloading matters in the original C++ version.
+</p>
+
+<pre class="code">  def init()
+    lcd = Qt::LCDNumber.new(2)
+    lcd.setSegmentStyle(Qt::LCDNumber::Filled)
+
+    @slider = Qt::Slider.new(Qt::Horizontal)
+    @slider.setRange(0, 99)
+    @slider.setValue(0)
+
+    @label = Qt::Label.new()
+    @label.setAlignment(Qt::AlignHCenter.to_i | Qt::AlignTop.to_i)
+
+    connect(@slider, SIGNAL('valueChanged(int)'),
+    lcd, SLOT('display(int)'))
+    connect(@slider, SIGNAL('valueChanged(int)'),
+    self, SIGNAL('valueChanged(int)'))
+
+    layout = Qt::VBoxLayout.new()
+    layout.addWidget(lcd)
+    layout.addWidget(@slider)
+    layout.addWidget(@label)
+    setLayout(layout)
+
+    setFocusProxy(@slider)
+  end
+</pre>
+
+<p>
+The setup of <code>lcd</code> and <code>slider</code> is the same as in the previous chapter. 
+Next we create a <a href="http://doc.trolltech.com/4.2/qlabel.html">Qt::Label</a> and tell it to align the contents centered horizontally and to the top vertically. 
+The <a href="http://doc.trolltech.com/4.2/qobject.html#connect">Qt::Object::connect()</a> calls have also been taken from the previous chapter.
+</p>
+
+<pre class="code">  def setText(s)
+    @label.setText(s)
+  end
+</pre>
+
+<p>
+This function sets the label text.
+</p>
+
+<h4><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/tutorial/t12/cannon.rb">cannon.rb</a></h4>
+
+<p>
+The <code>CannonField</code> now has two new signals: 
+<code>hit()</code> and <code>missed()</code>. 
+In addition, it contains a target.
+</p>
+
+<pre class="code">  signals 'hit()', 'missed()' #...
+</pre>
+
+<p>
+The <code>hit()</code> signal is emitted when a shot hits the target. 
+The <code>missed()</code> signal is emitted when the shot moves beyond the right 
+or bottom edge of the widget (i.e., it is certain that it has not and will not hit the target).
+</p>
+
+<pre class="code">    newTarget()
+</pre>
+
+<p>
+This line has been added to the constructor. It creates a "random" position for the target. 
+In fact, the <code>newTarget()</code> function will try to paint the target. 
+Because we are in a constructor, the <code>CannonField</code> widget is invisible. 
+Qt guarantees that no harm is done when calling <a href="http://doc.trolltech.com/4.2/qwidget.html#update">Qt::Widget::update()</a> on a hidden widget.
+</p>
+
+<pre class="code">  @@first_time = true
+
+  def newTarget()
+    if @@first_time
+      @@first_time = false
+      midnight = Qt::Time.new(0, 0, 0)
+      srand(midnight.secsTo(Qt::Time.currentTime()))
+    end
+
+    @target = Qt::Point.new(200 + rand(190), 10 + rand(255))
+    update()
+  end
+</pre>
+
+<p>
+This function creates a target center point at a new random position.
+</p>
+
+<p>
+We create the <a href="http://doc.trolltech.com/4.2/qtime.html">Qt::Time</a> object <code>midnight</code>, which represents the time 00:00:00.
+Next we fetch the number of seconds from midnight until now and use it as a random seed.
+See the documentation for <a href="http://doc.trolltech.com/4.2/qdate.html">Qt::Date</a>, <a href="http://doc.trolltech.com/4.2/qtime.html">Qt::Time</a>, and <a href="http://doc.trolltech.com/4.2/qdatetime.html">Qt::DateTime</a> for more information.
+</p>
+
+<p>
+Finally we calculate the target's center point. We keep it within the rectangle 
+(<i>x</i> = 200, <i>y</i> = 35, <i>width</i> = 190, <i>height</i> = 255), i.e., 
+the possible <i>x</i> and <i>y</i> values are 200 to 389 and 35 to 289, respectively) 
+in a coordinate system where we put <i>y</i> position 0 at the bottom edge 
+of the widget and let <i>y</i> values increase upwards <i>x</i> is as normal, 
+with 0 at the left edge and with <i>x</i> values increasing to the right.
+</p>
+
+<p>
+By experimentation we have found this to always be in reach of the shot.
+</p>
+
+<pre class="code">  def moveShot()
+    region = Qt::Region.new(shotRect())
+    @timerCount += 1
+
+    shotR = shotRect()
+</pre>
+
+<p>
+This part of the timer event has not changed from the previous chapter.
+</p>
+
+<pre class="code">    if shotR.intersects(targetRect()) 
+      @autoShootTimer.stop()
+      emit hit()
+</pre>
+
+<p>
+This <code>if</code> statement checks whether the shot rectangle intersects
+the target rectangle. If it does, the shot has hit the target (ouch!). 
+We stop the shoot timer and emit the <code>hit()</code> signal to 
+tell the outside world that a target was destroyed, and return.
+
+Note that we could have created a new target on the spot, 
+but because the <code>CannonField</code> is a component 
+we leave such decisions to the user of the component.
+</p>
+
+<pre class="code">    elsif shotR.x() &gt; width() || shotR.y() &gt; height()
+      @autoShootTimer.stop()
+      emit missed()
+</pre>
+
+<p>
+This is the same as in the previous chapter, except that it now emits the 
+<code>missed()</code> signal to tell the outside world about the failure.
+</p>
+
+<pre class="code">    else
+      region = region.unite(Qt::Region.new(shotR))
+    end
+    
+    update(region)
+  end
+</pre>
+
+<p>
+And the rest of the function is as before.
+</p>
+
+<p>
+<code>CannonField::paintEvent()</code> is as before, except that this has been added:
+</p>
+
+<pre class="code">    paintTarget(painter)
+</pre>
+
+<p>
+This line makes sure that the target is also painted when necessary.
+</p>
+
+<pre class="code">  def paintTarget(painter)
+    painter.setBrush(Qt::Brush.new(Qt::red))
+    painter.setPen(Qt::Pen.new(Qt::Color.new(Qt::black)))
+    painter.drawRect(targetRect())
+  end
+</pre>
+
+<p>
+This function paints the target; a rectangle filled with red and with a black outline.
+</p>
+
+<pre class="code">  def targetRect()
+    result = Qt::Rect.new(0, 0, 20, 10)
+    result.moveCenter(Qt::Point.new(@target.x(), height() - 1 - @target.y()))
+    return result
+  end
+
+</pre>
+
+<p>
+This private function returns the enclosing rectangle of the target. 
+Remember from <code>newTarget()</code> that the <code>target</code> 
+point uses <i>y</i> coordinate 0 at the bottom of the widget. 
+We calculate the point in widget coordinates before we call <a href="http://doc.trolltech.com/4.2/qrect.html#moveCenter">Qt::Rect::moveCenter()</a>.
+</p>
+
+<p>
+The reason we have chosen this coordinate mapping is to fix the distance 
+between the target and the bottom of the widget. 
+Remember that the widget can be resized by the user or the program at any time.
+</p>
+
+<h4><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/tutorial/t12/t12.rb">t12.rb</a></h4>
+
+<p>
+There are no new members in the <code>MyWidget</code> class, but we have 
+slightly changed the constructor to set the new <code>LCDRange</code> text labels.
+</p>
+
+<pre class="code">    angle = LCDRange.new(tr('ANGLE'))
+</pre>
+
+<p>
+We set the angle text label to "ANGLE".
+</p>
+
+<pre class="code">    force  = LCDRange.new(tr('FORCE'))
+</pre>
+
+<p>
+We set the force text label to "FORCE".
+</p>
+
+<h3>Running the Application</h3>
+
+<p>
+The <code>LCDRange</code> widgets look a bit strange: 
+When resizing <code>MyWidget</code>, the built-in layout management in 
+<a href="http://doc.trolltech.com/4.2/qvboxlayout.html">Qt::VBoxLayout</a> gives the labels too much space and the rest not enough; 
+making the space between the two <code>LCDRange</code> widgets change size. 
+We'll fix that in the next chapter
+</p>
+
+<!-- google_ad_section_start(weight=ignore) --><h3>Exercises</h3><!-- google_ad_section_end -->
+
+<p>
+Make a cheat button that, when pressed, makes the <code>CannonField</code> 
+display the shot trajectory for five seconds.
+</p>
+
+<p>
+If you did the "round shot" exercise from the previous chapter, 
+try changing the <code>shotRect()</code> to a <code>shotRegion()</code> 
+that returns a <a href="http://doc.trolltech.com/4.2/qregion.html">Qt::Region</a> so you can have really accurate collision detection.
+</p>
+
+<p>
+Make a moving target.
+</p>
+
+<p>
+Make sure that the target is always created entirely on-screen.
+</p>
+
+<p>
+Make sure that the widget cannot be resized so that the target isn't visible. 
+[Hint: <a href="http://doc.trolltech.com/4.2/qwidget.html#minimumSize-prop">Qt::Widget::setMinimumSize()</a> is your friend.]
+</p>
+
+<p>
+Not easy; make it possible to have several shots in the air at the same time. 
+[Hint: Make a <code>Shot</code> class.]
+</p>
+</div>
+<!-- google_ad_section_start(weight=ignore) -->
+<div class="navPrev">&nbsp;[Prev: <a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_11">Chapter 11</a>]</div>
+<div class="navContents">&nbsp;[<a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/">Contents</a>]&nbsp;</div>
+<div class="navNext">[Next: <a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_13">Chapter 13</a>]&nbsp;</div>
+<!-- google_ad_section_end -->
+<!-- google_ad_section_start(weight=ignore) -->
+<hr><div class="legal_link"><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/legal">Legal Notice</a>&nbsp;</div>
+<div class="contact_link"><a href="mailto:qt-tutorial@darshancomputing.com">Contact Me</a></div>
+<!-- google_ad_section_end -->
+<div class="force_clear"></div>
+</div>
+
+<p style="clear: both">
+</p><p style="margin-bottom: 0px;">
+  <a href="http://validator.w3.org/check?uri=referer"><img src="./Qt®4 Tutorial for the Ruby Programming Language_files/valid-xhtml10.png" alt="Valid XHTML 1.0!" height="31" width="88"></a>
+  <a href="http://jigsaw.w3.org/css-validator/check/referer"><img src="./Qt®4 Tutorial for the Ruby Programming Language_files/vcss.png" alt="Valid CSS!" height="31" width="88"></a>
+</p>
+
+<p style="margin-top: 10px; margin-bottom: 0px;">
+This page was last generated Sun Dec 03 14:40:27 -0800 2006
+</p>
+<script type="text/javascript">/* <![CDATA[ */(function(d,s,a,i,j,r,l,m,t){try{l=d.getElementsByTagName('a');t=d.createElement('textarea');for(i=0;l.length-i;i++){try{a=l[i].href;s=a.indexOf('/cdn-cgi/l/email-protection');m=a.length;if(a&&s>-1&&m>28){j=28+s;s='';if(j<m){r='0x'+a.substr(j,2)|0;for(j+=2;j<m&&a.charAt(j)!='X';j+=2)s+='%'+('0'+('0x'+a.substr(j,2)^r).toString(16)).slice(-2);j++;s=decodeURIComponent(s)+a.substr(j,m-j)}t.innerHTML=s.replace(/</g,'&lt;').replace(/>/g,'&gt;');l[i].href='mailto:'+t.value}}catch(e){}}}catch(e){}})(document);/* ]]> */</script>
+
+</body></html>

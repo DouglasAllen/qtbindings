@@ -1,0 +1,151 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!-- saved from url=(0063)https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_03 -->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><head profile="http://www.w3.org/2005/10/profile"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Qt®4 Tutorial for the Ruby Programming Language</title>
+
+<link rel="stylesheet" href="./Qt®4 Tutorial for the Ruby Programming Language_files/default.css" type="text/css">
+<link rel="icon" type="image/png" href="https://www.darshancomputing.com/favicon.png">
+<!-- google_ad_section_start(weight=ignore) -->
+<link rel="start" href="https://www.darshancomputing.com/qt4-qtruby-tutorial/">
+<link rel="next" href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_04">
+<link rel="prev" href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_02">
+<!-- google_ad_section_end -->
+</head>
+<body>
+<div class="page">
+<!-- google_ad_section_start(weight=ignore) -->
+<div class="navPrev">&nbsp;[Prev: <a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_02">Chapter 2</a>]</div>
+<div class="navContents">&nbsp;[<a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/">Contents</a>]&nbsp;</div>
+<div class="navNext">[Next: <a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_04">Chapter 4</a>]&nbsp;</div>
+<!-- google_ad_section_end -->
+<div class="content">
+<h1 class="title">Qt<sup>®</sup>4 Tutorial for the Ruby <br>Programming Language</h1>
+<!-- google_ad_section_start(weight=ignore) --><h2 class="subtitle">Chapter 3: Family Values</h2><!-- google_ad_section_end -->
+<div class="center"><img src="./Qt®4 Tutorial for the Ruby Programming Language_files/t3.png" alt="Screenshot: Family Values" width="208" height="151"></div>
+<br>
+Files:
+<ul>
+<li><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/tutorial/t3/t3.rb">t3.rb</a></li>
+</ul>
+<h3>Overview</h3>
+
+<p>
+This example shows how to create parent and child widgets.
+</p>
+
+<p>
+We'll keep it simple and use just a single parent and a lone child.
+</p>
+
+<pre class="code">require 'Qt4'
+
+app = Qt::Application.new(ARGV)
+
+window = Qt::Widget.new()
+window.resize(200, 120)
+
+quit = Qt::PushButton.new('Quit', window)
+quit.font = Qt::Font.new('Times', 18, Qt::Font::Bold)
+quit.setGeometry(10, 40, 180, 40)
+Qt::Object.connect(quit, SIGNAL('clicked()'), app, SLOT('quit()'))
+
+window.show()
+app.exec()
+</pre>
+
+<h3>Line by Line Walkthrough</h3>
+
+<pre class="code">window = Qt::Widget.new()
+</pre>
+
+<p>
+Here we simply create a plain widget object. 
+The <a href="http://doc.trolltech.com/4.2/qwidget.html">Qt::Widget</a> class is the base class of all user interface objects. 
+The widget is the atom of the user interface: 
+It receives mouse, keyboard and other events from the window system,
+ and paints a representation of itself on the screen. 
+A widget is clipped by its parent and by the widgets in front of it.
+</p>
+
+<p>
+A widget that isn't embedded in a parent widget, like this particular widget, is called a window. 
+Usually, windows have their own window frame and taskbar entry, provided by the window system. 
+A widget without a parent widget is always an independent window. 
+Its initial position on the screen is controlled by the window system.
+</p>
+
+<pre class="code">window.resize(200, 120)
+</pre>
+
+<p>
+We set the window's width to 200 pixels and its height to 120 pixels.
+</p>
+
+<pre class="code">quit = Qt::PushButton.new('Quit', window)
+</pre>
+
+<p>
+A child is born. This <a href="http://doc.trolltech.com/4.2/qpushbutton.html">Qt::PushButton</a> is created with a parent widget (<code>window</code>). 
+A child widget is always displayed within its parent's area. 
+When displayed, it is clipped by its parent's bounds. 
+By default, it is rooted at the top-left corner of its parent, at position (0, 0).
+</p>
+
+
+<pre class="code">quit.setGeometry(10, 40, 180, 40)
+</pre>
+
+<p>
+The <a href="http://doc.trolltech.com/4.2/qwidget.html#geometry-prop">Qt::Widget::setGeometry()</a> function takes four arguments: 
+The first two arguments are the x and y coordinates of the button's top-left corner. 
+The coordinates are relative to the parent widget. 
+The last two arguments are the button's width and height. 
+The result is a button that extends from position (10, 40) to position (190, 80).
+</p>
+
+<pre class="code">window.show()
+</pre>
+
+<p>
+When a parent widget is shown, it will call show for all its children (except those that were explicitly hidden using <a href="http://doc.trolltech.com/4.2/qwidget.html#hide">Qt::Widget::hide()</a>).
+</p>
+
+<h3>Running the Application</h3>
+
+<p>
+The button no longer fills the entire window. 
+Instead, it stays at position (10, 40) within the window and with a size of (180, 40), because of the <a href="http://doc.trolltech.com/4.2/qwidget.html#geometry-prop">Qt::Widget::setGeometry()</a> call.
+</p>
+
+<!-- google_ad_section_start(weight=ignore) --><h3>Exercises</h3><!-- google_ad_section_end -->
+
+<p>
+Try resizing the window. How does the button change? 
+What happens to the button's height if you run the program with a bigger font? 
+What happens if you try to make the window really small?
+</p>
+</div>
+<!-- google_ad_section_start(weight=ignore) -->
+<div class="navPrev">&nbsp;[Prev: <a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_02">Chapter 2</a>]</div>
+<div class="navContents">&nbsp;[<a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/">Contents</a>]&nbsp;</div>
+<div class="navNext">[Next: <a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_04">Chapter 4</a>]&nbsp;</div>
+<!-- google_ad_section_end -->
+<!-- google_ad_section_start(weight=ignore) -->
+<hr><div class="legal_link"><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/legal">Legal Notice</a>&nbsp;</div>
+<div class="contact_link"><a href="mailto:qt-tutorial@darshancomputing.com">Contact Me</a></div>
+<!-- google_ad_section_end -->
+<div class="force_clear"></div>
+</div>
+
+<p style="clear: both">
+</p><p style="margin-bottom: 0px;">
+  <a href="http://validator.w3.org/check?uri=referer"><img src="./Qt®4 Tutorial for the Ruby Programming Language_files/valid-xhtml10.png" alt="Valid XHTML 1.0!" height="31" width="88"></a>
+  <a href="http://jigsaw.w3.org/css-validator/check/referer"><img src="./Qt®4 Tutorial for the Ruby Programming Language_files/vcss.png" alt="Valid CSS!" height="31" width="88"></a>
+</p>
+
+<p style="margin-top: 10px; margin-bottom: 0px;">
+This page was last generated Sun Dec 03 14:40:27 -0800 2006
+</p>
+<script type="text/javascript">/* <![CDATA[ */(function(d,s,a,i,j,r,l,m,t){try{l=d.getElementsByTagName('a');t=d.createElement('textarea');for(i=0;l.length-i;i++){try{a=l[i].href;s=a.indexOf('/cdn-cgi/l/email-protection');m=a.length;if(a&&s>-1&&m>28){j=28+s;s='';if(j<m){r='0x'+a.substr(j,2)|0;for(j+=2;j<m&&a.charAt(j)!='X';j+=2)s+='%'+('0'+('0x'+a.substr(j,2)^r).toString(16)).slice(-2);j++;s=decodeURIComponent(s)+a.substr(j,m-j)}t.innerHTML=s.replace(/</g,'&lt;').replace(/>/g,'&gt;');l[i].href='mailto:'+t.value}}catch(e){}}}catch(e){}})(document);/* ]]> */</script>
+
+</body></html>

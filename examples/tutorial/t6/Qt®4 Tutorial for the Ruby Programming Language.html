@@ -1,0 +1,196 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!-- saved from url=(0063)https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_06 -->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><head profile="http://www.w3.org/2005/10/profile"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Qt®4 Tutorial for the Ruby Programming Language</title>
+
+<link rel="stylesheet" href="./Qt®4 Tutorial for the Ruby Programming Language_files/default.css" type="text/css">
+<link rel="icon" type="image/png" href="https://www.darshancomputing.com/favicon.png">
+<!-- google_ad_section_start(weight=ignore) -->
+<link rel="start" href="https://www.darshancomputing.com/qt4-qtruby-tutorial/">
+<link rel="next" href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_07">
+<link rel="prev" href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_05">
+<!-- google_ad_section_end -->
+</head>
+<body>
+<div class="page">
+<!-- google_ad_section_start(weight=ignore) -->
+<div class="navPrev">&nbsp;[Prev: <a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_05">Chapter 5</a>]</div>
+<div class="navContents">&nbsp;[<a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/">Contents</a>]&nbsp;</div>
+<div class="navNext">[Next: <a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_07">Chapter 7</a>]&nbsp;</div>
+<!-- google_ad_section_end -->
+<div class="content">
+<h1 class="title">Qt<sup>®</sup>4 Tutorial for the Ruby <br>Programming Language</h1>
+<!-- google_ad_section_start(weight=ignore) --><h2 class="subtitle">Chapter 6: Building Blocks Galore!</h2><!-- google_ad_section_end -->
+<div class="center"><img src="./Qt®4 Tutorial for the Ruby Programming Language_files/t6.png" alt="Screenshot: Building Blocks Galore!" width="348" height="295"></div>
+<br>
+Files:
+<ul>
+<li><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/tutorial/t6/t6.rb">t6.rb</a></li>
+</ul>
+<h3>Overview</h3>
+
+<p>
+This example shows how to encapsulate two widgets into a new component and how easy it is to use many widgets. 
+For the first time, we use a custom widget as a child widget.
+</p>
+
+<pre class="code">require 'Qt4'
+
+class LCDRange &lt; Qt::Widget
+  def initialize(parent = nil)
+    super()
+    lcd = Qt::LCDNumber.new(2)
+
+    slider = Qt::Slider.new(Qt::Horizontal)
+    slider.setRange(0, 99)
+    slider.setValue(0)
+
+    connect(slider, SIGNAL('valueChanged(int)'), lcd, SLOT('display(int)'))
+
+    layout = Qt::VBoxLayout.new()
+    layout.addWidget(lcd)
+    layout.addWidget(slider)
+    setLayout(layout)
+  end
+end
+
+class MyWidget &lt; Qt::Widget
+  def initialize(parent = nil)
+    super()
+    quit = Qt::PushButton.new(tr('Quit'))
+    quit.setFont(Qt::Font.new('Times', 18, Qt::Font::Bold))
+    connect(quit, SIGNAL('clicked()'), $qApp, SLOT('quit()'))
+
+    grid = Qt::GridLayout.new()
+    
+    for row in 0..2
+      for column in 0..2
+        grid.addWidget(LCDRange.new(), row, column)
+      end
+    end
+
+    layout = Qt::VBoxLayout.new()
+    layout.addWidget(quit)
+    layout.addLayout(grid)
+    setLayout(layout)
+  end
+end    
+
+app = Qt::Application.new(ARGV)
+
+widget = MyWidget.new()
+widget.show()
+
+app.exec()
+</pre>
+
+<h3>Line by Line Walkthrough</h3>
+
+<pre class="code">class LCDRange &lt; Qt::Widget
+</pre>
+
+<p>
+The <code>LCDRange</code> widget is a widget without any API. It just has a constructor. 
+This sort of widget is not very useful, so we'll add some API later.
+</p>
+
+<pre class="code">  def initialize(parent = nil)
+    super()
+    lcd = Qt::LCDNumber.new(2)
+    slider = Qt::Slider.new(Qt::Horizontal)
+    slider.setRange(0, 99)
+    slider.setValue(0)
+
+    connect(slider, SIGNAL('valueChanged(int)'), lcd, SLOT('display(int)'))
+
+    layout = Qt::VBoxLayout.new()
+    layout.addWidget(lcd)
+    layout.addWidget(slider)
+    setLayout(layout)
+  end
+</pre>
+
+<p>
+This is lifted straight from the <code>MyWidget</code> constructor in Chapter 5. 
+The only differences are that the <b>Quit</b> button is left out and the class is renamed.
+</p>
+
+<pre class="code">class MyWidget &lt; Qt::Widget
+</pre>
+
+<p>
+<code>MyWidget</code>, too, contains no API except a constructor.
+</p>
+
+<pre class="code">  def initialize(parent = nil)
+    super()
+    quit = Qt::PushButton.new(tr('Quit'))
+    quit.setFont(Qt::Font.new('Times', 18, Qt::Font::Bold))
+    connect(quit, SIGNAL('clicked()'), $qApp, SLOT('quit()'))
+</pre>
+
+<p>
+The push button that used to be in what is now <code>LCDRange</code> has been separated 
+so that we can have one <b>Quit</b> button and many <code>LCDRange</code> objects.
+</p>
+
+<pre class="code">    grid = Qt::GridLayout.new()
+</pre>
+
+<p>
+We create a <a href="http://doc.trolltech.com/4.2/qwidget.html">Qt::Widget</a> with a <a href="http://doc.trolltech.com/4.2/qgridlayout.html">Qt::GridLayout</a> that will contain three columns. 
+The <a href="http://doc.trolltech.com/4.2/qgridlayout.html">Qt::GridLayout</a> automatically arranges its widgets in rows and columns; 
+you can specify the row and column numbers when adding widgets to the layout, 
+and <a href="http://doc.trolltech.com/4.2/qgridlayout.html">Qt::GridLayout</a> will fit them into the grid.
+</p>
+
+<pre class="code">    for row in 0..2
+      for column in 0..2
+        grid.addWidget(LCDRange.new(), row, column)
+      end
+    end
+</pre>
+
+<p>
+We create nine <code>LCDRange</code> widgets, all of which are children of the grid object, 
+and we arrange them in three rows and three columns.
+</p>
+
+<h3>Running the Application</h3>
+
+<p>
+This program shows how easy it is to use many widgets at a time. 
+Each one behaves like the slider and LCD number in the previous chapter. 
+Again, the difference lies in the implementation.
+</p>
+
+<!-- google_ad_section_start(weight=ignore) --><h3>Exercises</h3><!-- google_ad_section_end -->
+
+<p>
+Initialize each slider with a different/random value on startup.
+</p>
+</div>
+<!-- google_ad_section_start(weight=ignore) -->
+<div class="navPrev">&nbsp;[Prev: <a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_05">Chapter 5</a>]</div>
+<div class="navContents">&nbsp;[<a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/">Contents</a>]&nbsp;</div>
+<div class="navNext">[Next: <a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_07">Chapter 7</a>]&nbsp;</div>
+<!-- google_ad_section_end -->
+<!-- google_ad_section_start(weight=ignore) -->
+<hr><div class="legal_link"><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/legal">Legal Notice</a>&nbsp;</div>
+<div class="contact_link"><a href="mailto:qt-tutorial@darshancomputing.com">Contact Me</a></div>
+<!-- google_ad_section_end -->
+<div class="force_clear"></div>
+</div>
+
+<p style="clear: both">
+</p><p style="margin-bottom: 0px;">
+  <a href="http://validator.w3.org/check?uri=referer"><img src="./Qt®4 Tutorial for the Ruby Programming Language_files/valid-xhtml10.png" alt="Valid XHTML 1.0!" height="31" width="88"></a>
+  <a href="http://jigsaw.w3.org/css-validator/check/referer"><img src="./Qt®4 Tutorial for the Ruby Programming Language_files/vcss.png" alt="Valid CSS!" height="31" width="88"></a>
+</p>
+
+<p style="margin-top: 10px; margin-bottom: 0px;">
+This page was last generated Sun Dec 03 14:40:27 -0800 2006
+</p>
+<script type="text/javascript">/* <![CDATA[ */(function(d,s,a,i,j,r,l,m,t){try{l=d.getElementsByTagName('a');t=d.createElement('textarea');for(i=0;l.length-i;i++){try{a=l[i].href;s=a.indexOf('/cdn-cgi/l/email-protection');m=a.length;if(a&&s>-1&&m>28){j=28+s;s='';if(j<m){r='0x'+a.substr(j,2)|0;for(j+=2;j<m&&a.charAt(j)!='X';j+=2)s+='%'+('0'+('0x'+a.substr(j,2)^r).toString(16)).slice(-2);j++;s=decodeURIComponent(s)+a.substr(j,m-j)}t.innerHTML=s.replace(/</g,'&lt;').replace(/>/g,'&gt;');l[i].href='mailto:'+t.value}}catch(e){}}}catch(e){}})(document);/* ]]> */</script>
+
+</body></html>

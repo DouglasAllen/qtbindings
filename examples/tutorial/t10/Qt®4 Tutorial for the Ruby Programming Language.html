@@ -1,0 +1,241 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!-- saved from url=(0063)https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_10 -->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><head profile="http://www.w3.org/2005/10/profile"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Qt®4 Tutorial for the Ruby Programming Language</title>
+
+<link rel="stylesheet" href="./Qt®4 Tutorial for the Ruby Programming Language_files/default.css" type="text/css">
+<link rel="icon" type="image/png" href="https://www.darshancomputing.com/favicon.png">
+<!-- google_ad_section_start(weight=ignore) -->
+<link rel="start" href="https://www.darshancomputing.com/qt4-qtruby-tutorial/">
+<link rel="next" href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_11">
+<link rel="prev" href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_09">
+<!-- google_ad_section_end -->
+</head>
+<body>
+<div class="page">
+<!-- google_ad_section_start(weight=ignore) -->
+<div class="navPrev">&nbsp;[Prev: <a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_09">Chapter 9</a>]</div>
+<div class="navContents">&nbsp;[<a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/">Contents</a>]&nbsp;</div>
+<div class="navNext">[Next: <a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_11">Chapter 11</a>]&nbsp;</div>
+<!-- google_ad_section_end -->
+<div class="content">
+<h1 class="title">Qt<sup>®</sup>4 Tutorial for the Ruby <br>Programming Language</h1>
+<!-- google_ad_section_start(weight=ignore) --><h2 class="subtitle">Chapter 10: Smooth as Silk</h2><!-- google_ad_section_end -->
+<div class="center"><img src="./Qt®4 Tutorial for the Ruby Programming Language_files/t10.png" alt="Screenshot: Smooth as Silk" width="508" height="386"></div>
+<br>
+Files:
+<ul>
+<li><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/tutorial/t10/cannon.rb">cannon.rb</a></li>
+<li><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/tutorial/t10/t10.rb">t10.rb</a></li>
+<li><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/tutorial/t10/lcdrange.rb">lcdrange.rb</a></li>
+</ul>
+<h3>Overview</h3>
+
+<p>
+In this example, we add a force control.
+</p>
+
+<h3>Line by Line Walkthrough</h3>
+
+<h4><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/tutorial/t10/cannon.rb">cannon.rb</a></h4>
+
+<p>
+The <code>CannonField</code> now has a force value in addition to the angle.
+</p>
+
+<pre class="code">  signals 'angleChanged(int)', 'forceChanged(int)'
+  slots 'setAngle(int)', 'setForce(int)'
+</pre>
+
+<p>
+The interface to the force follows the same practice as for the angle.
+</p>
+
+<pre class="code">  def initialize(parent = nil)
+    super()
+
+    @currentAngle = 45
+    @currentForce = 0
+
+    setPalette(Qt::Palette.new(Qt::Color.new(250, 250, 200)))
+    setAutoFillBackground(true)
+  end
+</pre>
+
+<p>
+The force <code>@currentForce</code> is initialized to zero.
+</p>
+
+<pre class="code">  def setAngle(angle)
+    if angle &lt; 5
+      angle = 5
+    elsif angle &gt; 70
+      angle = 70
+    end
+
+    if @currentAngle == angle
+      return
+    end
+
+    @currentAngle = angle
+    update(cannonRect())
+    emit angleChanged(@currentAngle)
+  end
+</pre>
+
+<p>
+We have made a slight change in the <code>setAngle()</code> function. 
+It repaints only the portion of the widget that contains the cannon.
+</p>
+
+<pre class="code">  def setForce(force)
+    if force &lt; 0
+      force = 0
+    end
+    if @currentForce == force
+      return
+    end
+
+    @currentForce = force
+    emit forceChanged(@currentForce)
+  end
+</pre>
+
+<p>
+The implementation of <code>setForce()</code> is quite similar to that of <code>setAngle()</code>.
+The only difference is that because we don't show the force value, we don't need to repaint the widget.
+</p>
+
+<pre class="code">  def paintEvent(event)
+    painter = Qt::Painter.new(self)
+
+    painter.setPen(Qt::NoPen)
+    painter.setBrush(Qt::Brush.new(Qt::blue))
+
+    painter.translate(0, height())
+    painter.drawPie(Qt::Rect.new(-35, -35, 70, 70), 0, 90 * 16)
+    painter.rotate(-@currentAngle)
+    painter.drawRect(Qt::Rect.new(30, -5, 20, 10))
+    painter.end()
+  end
+</pre>
+
+<p>
+We paint as in Chapter 9.
+</p>
+
+<pre class="code">  def cannonRect()
+    result = Qt::Rect.new(0, 0, 50, 50)
+    result.moveBottomLeft(rect().bottomLeft())
+    return result
+  end
+</pre>
+
+<p>
+The <code>cannonRect()</code> function returns the rectangle enclosing the cannon in widget coordinates. 
+First we create a rectangle with the size 50 x 50 and then move it so its bottom-left corner is equal to the widget's own bottom-left corner.
+</p>
+
+<p>
+The <a href="http://doc.trolltech.com/4.2/qwidget.html#rect-prop">Qt::Widget::rect()</a> function returns the widget's enclosing rectangle in the widget's own coordinates. 
+The top-left corner of the rectangle is always (0, 0).
+</p>
+
+<h4><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/tutorial/t10/t10.rb">t10.rb</a></h4>
+
+<p>
+The constructor is mostly the same, but some new bits have been added.
+</p>
+
+<pre class="code">    force = LCDRange.new()
+    force.setRange(10, 50)
+</pre>
+
+<p>
+We add a second <code>LCDRange</code>, which will be used to set the force.
+</p>
+
+<pre class="code">    connect(force, SIGNAL('valueChanged(int)'),
+             cannonField, SLOT('setForce(int)'))
+    connect(cannonField, SIGNAL('forceChanged(int)'),
+             force, SLOT('setValue(int)'))
+</pre>
+
+<p>
+We connect the <code>force</code> widget and the <code>cannonField</code> widget, 
+just like we did for the <code>angle</code> widget.
+</p>
+
+<pre class="code">    leftLayout = Qt::VBoxLayout.new()
+    leftLayout.addWidget(angle)
+    leftLayout.addWidget(force)
+
+    gridLayout = Qt::GridLayout.new()
+    gridLayout.addWidget(quit, 0, 0)
+    gridLayout.addLayout(leftLayout, 1, 0)
+    gridLayout.addWidget(cannonField, 1, 1, 2, 1)
+    gridLayout.setColumnStretch(1, 10)
+</pre>
+
+<p>
+In Chapter 9, we put <code>angle</code> in the lower-left cell of the layout. 
+Now we want to have two widgets in that cell, so we make a vertical box, 
+put the vertical box in the grid cell, and put each of <code>angle</code> 
+and <code>range</code> in the vertical box.
+</p>
+
+<pre class="code">    force.setValue(25)
+</pre>
+
+<p>
+We initialize the force value to 25.
+</p>
+
+<h3>Running the Application</h3>
+
+<p>
+We now have a force control.
+</p>
+
+<!-- google_ad_section_start(weight=ignore) --><h3>Exercises</h3><!-- google_ad_section_end -->
+
+<p>
+Make the size of the cannon barrel be dependent on the force.
+</p>
+
+<p>
+Put the cannon in the bottom-right corner.
+</p>
+
+<p>
+Try adding a better keyboard interface. 
+For example, make <code>+</code> and <code>-</code> increase and decrease the force and enter shoot. 
+If you're bothered by the way the <code>Left</code> and <code>Right</code> keys work, change that too.
+[Hint: Reimplement <a href="http://doc.trolltech.com/4.2/qwidget.html#keyPressEvent">Qt::Widget::keyPressEvent()</a>.]
+</p>
+
+</div>
+<!-- google_ad_section_start(weight=ignore) -->
+<div class="navPrev">&nbsp;[Prev: <a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_09">Chapter 9</a>]</div>
+<div class="navContents">&nbsp;[<a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/">Contents</a>]&nbsp;</div>
+<div class="navNext">[Next: <a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_11">Chapter 11</a>]&nbsp;</div>
+<!-- google_ad_section_end -->
+<!-- google_ad_section_start(weight=ignore) -->
+<hr><div class="legal_link"><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/legal">Legal Notice</a>&nbsp;</div>
+<div class="contact_link"><a href="mailto:qt-tutorial@darshancomputing.com">Contact Me</a></div>
+<!-- google_ad_section_end -->
+<div class="force_clear"></div>
+</div>
+
+<p style="clear: both">
+</p><p style="margin-bottom: 0px;">
+  <a href="http://validator.w3.org/check?uri=referer"><img src="./Qt®4 Tutorial for the Ruby Programming Language_files/valid-xhtml10.png" alt="Valid XHTML 1.0!" height="31" width="88"></a>
+  <a href="http://jigsaw.w3.org/css-validator/check/referer"><img src="./Qt®4 Tutorial for the Ruby Programming Language_files/vcss.png" alt="Valid CSS!" height="31" width="88"></a>
+</p>
+
+<p style="margin-top: 10px; margin-bottom: 0px;">
+This page was last generated Sun Dec 03 14:40:27 -0800 2006
+</p>
+<script type="text/javascript">/* <![CDATA[ */(function(d,s,a,i,j,r,l,m,t){try{l=d.getElementsByTagName('a');t=d.createElement('textarea');for(i=0;l.length-i;i++){try{a=l[i].href;s=a.indexOf('/cdn-cgi/l/email-protection');m=a.length;if(a&&s>-1&&m>28){j=28+s;s='';if(j<m){r='0x'+a.substr(j,2)|0;for(j+=2;j<m&&a.charAt(j)!='X';j+=2)s+='%'+('0'+('0x'+a.substr(j,2)^r).toString(16)).slice(-2);j++;s=decodeURIComponent(s)+a.substr(j,m-j)}t.innerHTML=s.replace(/</g,'&lt;').replace(/>/g,'&gt;');l[i].href='mailto:'+t.value}}catch(e){}}}catch(e){}})(document);/* ]]> */</script>
+
+</body></html>

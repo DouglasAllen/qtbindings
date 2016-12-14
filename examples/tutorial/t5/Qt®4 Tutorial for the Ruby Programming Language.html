@@ -1,0 +1,184 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!-- saved from url=(0063)https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_05 -->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><head profile="http://www.w3.org/2005/10/profile"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Qt®4 Tutorial for the Ruby Programming Language</title>
+
+<link rel="stylesheet" href="./Qt®4 Tutorial for the Ruby Programming Language_files/default.css" type="text/css">
+<link rel="icon" type="image/png" href="https://www.darshancomputing.com/favicon.png">
+<!-- google_ad_section_start(weight=ignore) -->
+<link rel="start" href="https://www.darshancomputing.com/qt4-qtruby-tutorial/">
+<link rel="next" href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_06">
+<link rel="prev" href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_04">
+<!-- google_ad_section_end -->
+</head>
+<body>
+<div class="page">
+<!-- google_ad_section_start(weight=ignore) -->
+<div class="navPrev">&nbsp;[Prev: <a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_04">Chapter 4</a>]</div>
+<div class="navContents">&nbsp;[<a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/">Contents</a>]&nbsp;</div>
+<div class="navNext">[Next: <a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_06">Chapter 6</a>]&nbsp;</div>
+<!-- google_ad_section_end -->
+<div class="content">
+<h1 class="title">Qt<sup>®</sup>4 Tutorial for the Ruby <br>Programming Language</h1>
+<!-- google_ad_section_start(weight=ignore) --><h2 class="subtitle">Chapter 5: Building Blocks</h2><!-- google_ad_section_end -->
+<div class="center"><img src="./Qt®4 Tutorial for the Ruby Programming Language_files/t5.png" alt="Screenshot: Building Blocks" width="208" height="141"></div>
+<br>
+Files:
+<ul>
+<li><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/tutorial/t5/t5.rb">t5.rb</a></li>
+</ul>
+<h3>Overview</h3>
+
+<p>
+This example shows how to create and connect together several widgets by using signals and slots, and how to handle resizes.
+</p>
+
+<pre class="code">require 'Qt4'
+
+class MyWidget &lt; Qt::Widget
+  def initialize()
+    super()
+    quit = Qt::PushButton.new('Quit')
+    quit.setFont(Qt::Font.new('Times', 18, Qt::Font::Bold))
+    
+    lcd = Qt::LCDNumber.new(2)
+
+    slider = Qt::Slider.new(Qt::Horizontal)
+    slider.setRange(0, 99)
+    slider.setValue(0)
+
+    connect(quit, SIGNAL('clicked()'), $qApp, SLOT('quit()'))
+    connect(slider, SIGNAL('valueChanged(int)'), lcd, SLOT('display(int)'))
+
+    layout = Qt::VBoxLayout.new()
+    layout.addWidget(quit)
+    layout.addWidget(lcd)
+    layout.addWidget(slider)
+    setLayout(layout)
+  end
+end
+
+app = Qt::Application.new(ARGV)
+
+widget = MyWidget.new()
+
+widget.show()
+app.exec()
+</pre>
+
+<h3>Line by Line Walkthrough</h3>
+
+<pre class="code">    lcd = Qt::LCDNumber.new(2)
+</pre>
+
+<p>
+<code>lcd</code> is a <a href="http://doc.trolltech.com/4.2/qlcdnumber.html">Qt::LCDNumber</a>, a widget that displays numbers in an LCD-like fashion. 
+This instance is set up to display two digits.
+</p>
+
+<pre class="code">    slider = Qt::Slider.new(Qt::Horizontal)
+    slider.setRange(0, 99)
+    slider.setValue(0)
+</pre>
+
+<p>
+The user can use the <a href="http://doc.trolltech.com/4.2/qslider.html">Qt::Slider</a> widget to adjust an integer value in a range. 
+Here we create a horizontal one, set its minimum value to 0, its maximum value to 99, and its initial value to 0.
+</p>
+
+<pre class="code">    connect(slider, SIGNAL('valueChanged(int)'), lcd, SLOT('display(int)'))
+</pre>
+
+<p>
+Here we use the <a href="http://doc.trolltech.com/4.2/signalsandslots.html">signals and slots</a>
+mechanism to connect the slider's <a href="http://doc.trolltech.com/4.2/qabstractslider.html#valueChanged">QAbstractSlider::valueChanged()</a> signal to the LCD number's display() slot.
+</p>
+
+<p>
+Whenever the slider's value changes it broadcasts the new value by emitting the <a href="http://doc.trolltech.com/4.2/qabstractslider.html#valueChanged">QAbstractSlider::valueChanged()</a> signal. 
+Because that signal is connected to the LCD number's <a href="http://doc.trolltech.com/4.2/qlcdnumber.html#intValue-prop">QLCDNumber::display()</a> slot, the slot is called when the signal is broadcast. 
+Neither of the objects knows about the other. This is essential in component programming.
+</p>
+
+<pre class="code">    layout = Qt::VBoxLayout.new()
+    layout.addWidget(quit)
+    layout.addWidget(lcd)
+    layout.addWidget(slider)
+    setLayout(layout)
+</pre>
+
+<p>
+<code>MyWidget</code> now uses a <a href="http://doc.trolltech.com/4.2/qvboxlayout.html">Qt::VBoxLayout</a> to manage the geometry of its child widgets. 
+For that reason, we don't need to specify the screen coordinates for each widget like we did in Chapter 4. 
+In addition, using a layout ensures that the child widgets are resized when the window is resized. 
+Then we add the <code>quit</code>, <code>lcd</code>, and <code>slider</code> widgets to the layout using <a href="http://doc.trolltech.com/4.2/qboxlayout.html#addWidget">Qt::BoxLayout::addWidget()</a>.
+</p>
+
+<p>
+The <a href="http://doc.trolltech.com/4.2/qwidget.html#setLayout">Qt::Widget::setLayout()</a> function installs the layout on <code>MyWidget</code>. 
+This makes the layout a child widget of <code>MyWidget</code> so we don't have to worry about deleting it; 
+it will be deleted together with <code>MyWidget</code>. 
+Also, the call to <a href="http://doc.trolltech.com/4.2/qwidget.html#setLayout">Qt::Widget::setLayout()</a> automatically reparents the widgets in the layout so that they are children of <code>MyWidget</code>. 
+Because of this, we didn't need to specify <code>self</code> as the parent for 
+the <code>quit</code>, <code>lcd</code>, and <code>slider</code> widgets.
+</p>
+
+<p>
+In Qt, widgets are either children of other widgets (e.g. <code>self</code>), or they have no parent. 
+A widget can be <em>added</em> to a layout, 
+in which case the layout becomes responsible for managing the geometry of that widget, 
+but the layout can never act as a parent itself. 
+Indeed, <a href="http://doc.trolltech.com/4.2/qwidget.html">Qt::Widget</a>'s constructor takes a <a href="http://doc.trolltech.com/4.2/qwidget.html">Qt::Widget</a> pointer for the parent, and <a href="http://doc.trolltech.com/4.2/qlayout.html">Qt::Layout</a> doesn't inherit from <a href="http://doc.trolltech.com/4.2/qwidget.html">Qt::Widget</a>.
+</p>
+
+<h3>Running the Application</h3>
+
+<p>
+The LCD number reflects everything you do to the slider, and the widget handles resizing well. 
+Notice that the LCD number widget changes in size when the window is resized (because it can), 
+but the others stay about the same (because otherwise they would look strange).
+</p>
+
+<!-- google_ad_section_start(weight=ignore) --><h3>Exercises</h3><!-- google_ad_section_end -->
+
+<p>
+Try changing the LCD number to add more digits or to change mode (<a href="http://doc.trolltech.com/4.2/qlcdnumber.html#mode-prop">Qt::LCDNumber::setMode()</a>). 
+You can even add four push buttons to set the number base.
+</p>
+
+<p>
+You can also change the slider's range.
+</p>
+
+<p>
+Perhaps it would have been better to use <a href="http://doc.trolltech.com/4.2/qspinbox.html">Qt::SpinBox</a> than a slider?
+</p>
+
+<p>
+Try to make the application quit when the LCD number overflows.
+</p>
+</div>
+<!-- google_ad_section_start(weight=ignore) -->
+<div class="navPrev">&nbsp;[Prev: <a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_04">Chapter 4</a>]</div>
+<div class="navContents">&nbsp;[<a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/">Contents</a>]&nbsp;</div>
+<div class="navNext">[Next: <a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_06">Chapter 6</a>]&nbsp;</div>
+<!-- google_ad_section_end -->
+<!-- google_ad_section_start(weight=ignore) -->
+<hr><div class="legal_link"><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/legal">Legal Notice</a>&nbsp;</div>
+<div class="contact_link"><a href="mailto:qt-tutorial@darshancomputing.com">Contact Me</a></div>
+<!-- google_ad_section_end -->
+<div class="force_clear"></div>
+</div>
+
+<p style="clear: both">
+</p><p style="margin-bottom: 0px;">
+  <a href="http://validator.w3.org/check?uri=referer"><img src="./Qt®4 Tutorial for the Ruby Programming Language_files/valid-xhtml10.png" alt="Valid XHTML 1.0!" height="31" width="88"></a>
+  <a href="http://jigsaw.w3.org/css-validator/check/referer"><img src="./Qt®4 Tutorial for the Ruby Programming Language_files/vcss.png" alt="Valid CSS!" height="31" width="88"></a>
+</p>
+
+<p style="margin-top: 10px; margin-bottom: 0px;">
+This page was last generated Sun Dec 03 14:40:27 -0800 2006
+</p>
+<script type="text/javascript">/* <![CDATA[ */(function(d,s,a,i,j,r,l,m,t){try{l=d.getElementsByTagName('a');t=d.createElement('textarea');for(i=0;l.length-i;i++){try{a=l[i].href;s=a.indexOf('/cdn-cgi/l/email-protection');m=a.length;if(a&&s>-1&&m>28){j=28+s;s='';if(j<m){r='0x'+a.substr(j,2)|0;for(j+=2;j<m&&a.charAt(j)!='X';j+=2)s+='%'+('0'+('0x'+a.substr(j,2)^r).toString(16)).slice(-2);j++;s=decodeURIComponent(s)+a.substr(j,m-j)}t.innerHTML=s.replace(/</g,'&lt;').replace(/>/g,'&gt;');l[i].href='mailto:'+t.value}}catch(e){}}}catch(e){}})(document);/* ]]> */</script>
+
+</body></html>

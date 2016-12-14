@@ -1,0 +1,115 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!-- saved from url=(0053)https://www.darshancomputing.com/qt4-qtruby-tutorial/ -->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><head profile="http://www.w3.org/2005/10/profile"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Qt®4 Tutorial for the Ruby Programming Language</title>
+
+<link rel="stylesheet" href="./Qt®4 Tutorial for the Ruby Programming Language_files/default.css" type="text/css">
+<link rel="icon" type="image/png" href="https://www.darshancomputing.com/favicon.png">
+<!-- google_ad_section_start(weight=ignore) -->
+<link rel="start" href="https://www.darshancomputing.com/qt4-qtruby-tutorial/">
+<link rel="next" href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_01">
+<!-- google_ad_section_end -->
+</head>
+<body>
+<div class="page">
+<!-- google_ad_section_start(weight=ignore) -->
+<div class="navPrev">&nbsp;</div>
+<div class="navContents">&nbsp;&nbsp;</div>
+<div class="navNext">[Next: <a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_01">Chapter 1</a>]&nbsp;</div>
+<!-- google_ad_section_end -->
+<div class="content">
+<h1 class="title">Qt<sup>®</sup>4 Tutorial for the Ruby <br>Programming Language</h1>
+<p>
+This tutorial gives an introduction to GUI programming using the
+<a href="http://www.trolltech.com/products/qt">Qt toolkit</a>, the
+<a href="http://www.ruby-lang.org/">Ruby Programming Language</a>, and
+<a href="http://rubyforge.org/projects/korundum/">qt4-qtruby</a> <sup>*</sup>.
+It is simply a port of <a href="http://trolltech.com/">Trolltech</a>'s fine
+<a href="http://doc.trolltech.com/4.2/tutorial.html">Qt Tutorial</a>.
+Therefore, most of the text after this paragraph comes straight from their tutorial.
+I have modified it as necessary to make it make sense with the Ruby bindings,
+and have rearranged or rewritten a few parts to make them (I hope) a bit clearer.
+See the <a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/legal.html">Legal Notice</a> for copyright and legal information.
+</p>
+
+<p>
+This tutorial doesn't cover everything; the emphasis is on teaching the programming philosophy of GUI programming,
+and Qt's features are introduced as needed. Some commonly used features are never used in this tutorial.
+</p>
+
+<p>
+Chapter one starts with a minimal "Hello world" program and the following chapters introduce new concepts.
+By Chapter 14, the "Hello world" program from Chapter 1 will have turned into a 448-line game.
+</p>
+
+<p>
+If you're completely new to Qt, you might want to read
+<a href="http://doc.trolltech.com/4.2/how-to-learn-qt.html">How to Learn Qt</a> if you haven't already done so.
+Keep in mind that like most documents about Qt, it is very C++ oriented.
+</p>
+
+<p>Tutorial chapters:</p>
+
+<ol>
+<li><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_01">Hello World!</a></li>
+<li><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_02">Calling it Quits</a></li>
+<li><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_03">Family Values</a></li>
+<li><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_04">Let There Be Widgets</a></li>
+<li><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_05">Building Blocks</a></li>
+<li><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_06">Building Blocks Galore!</a></li>
+<li><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_07">One Thing Leads to Another</a></li>
+<li><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_08">Preparing for Battle</a></li>
+<li><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_09">With Cannon You Can</a></li>
+<li><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_10">Smooth as Silk</a></li>
+<li><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_11">Giving It a Shot</a></li>
+<li><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_12">Hanging in the Air the Way Bricks Don't</a></li>
+<li><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_13">Game Over</a></li>
+<li><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_14">Facing the Wall</a></li>
+</ol>
+
+<p>
+This little game doesn't look much like a modern GUI application.
+It uses some GUI techniques, but after you've worked through it,
+I recommend checking out the <a href="http://doc.trolltech.com/4.2/mainwindows-application.html">Application</a> example
+from Trolltech's site,
+which presents a small GUI application with menus, tool bars, a status bar, and so on.
+There are quite a few very educational <a href="http://doc.trolltech.com/4.2/examples.html">Examples</a> on Trolltech's site.
+They are all written in C++, but are easy enough to follow since the point of them is to demonstrate
+usage of the Qt library, not C++ features.
+</p>
+
+<hr>
+
+<p class="footnote">
+<sup>*</sup> I'm using qt4-qtruby version 1.4.7.
+If you're using an older version, the main change you need to be aware of
+is that you need to
+<code>require 'Qt'</code> rather than <code>require 'Qt4'</code>.
+There may be other modifications necessary, but I'm not aware of them.
+I'm using qt 4.2.1 and ruby 1.8.5.
+</p>
+</div>
+<!-- google_ad_section_start(weight=ignore) -->
+<div class="navPrev">&nbsp;</div>
+<div class="navContents">&nbsp;&nbsp;</div>
+<div class="navNext">[Next: <a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_01">Chapter 1</a>]&nbsp;</div>
+<!-- google_ad_section_end -->
+<!-- google_ad_section_start(weight=ignore) -->
+<hr><div class="legal_link"><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/legal">Legal Notice</a>&nbsp;</div>
+<div class="contact_link"><a href="mailto:qt-tutorial@darshancomputing.com">Contact Me</a></div>
+<!-- google_ad_section_end -->
+<div class="force_clear"></div>
+</div>
+
+<p style="clear: both">
+</p><p style="margin-bottom: 0px;">
+  <a href="http://validator.w3.org/check?uri=referer"><img src="./Qt®4 Tutorial for the Ruby Programming Language_files/valid-xhtml10.png" alt="Valid XHTML 1.0!" height="31" width="88"></a>
+  <a href="http://jigsaw.w3.org/css-validator/check/referer"><img src="./Qt®4 Tutorial for the Ruby Programming Language_files/vcss.png" alt="Valid CSS!" height="31" width="88"></a>
+</p>
+
+<p style="margin-top: 10px; margin-bottom: 0px;">
+This page was last generated Sun Dec 03 14:40:27 -0800 2006
+</p>
+<script type="text/javascript">/* <![CDATA[ */(function(d,s,a,i,j,r,l,m,t){try{l=d.getElementsByTagName('a');t=d.createElement('textarea');for(i=0;l.length-i;i++){try{a=l[i].href;s=a.indexOf('/cdn-cgi/l/email-protection');m=a.length;if(a&&s>-1&&m>28){j=28+s;s='';if(j<m){r='0x'+a.substr(j,2)|0;for(j+=2;j<m&&a.charAt(j)!='X';j+=2)s+='%'+('0'+('0x'+a.substr(j,2)^r).toString(16)).slice(-2);j++;s=decodeURIComponent(s)+a.substr(j,m-j)}t.innerHTML=s.replace(/</g,'&lt;').replace(/>/g,'&gt;');l[i].href='mailto:'+t.value}}catch(e){}}}catch(e){}})(document);/* ]]> */</script>
+
+</body></html>

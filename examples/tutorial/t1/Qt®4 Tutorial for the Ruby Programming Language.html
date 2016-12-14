@@ -1,0 +1,181 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!-- saved from url=(0063)https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_01 -->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><head profile="http://www.w3.org/2005/10/profile"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Qt®4 Tutorial for the Ruby Programming Language</title>
+
+<link rel="stylesheet" href="./Qt®4 Tutorial for the Ruby Programming Language_files/default.css" type="text/css">
+<link rel="icon" type="image/png" href="https://www.darshancomputing.com/favicon.png">
+<!-- google_ad_section_start(weight=ignore) -->
+<link rel="start" href="https://www.darshancomputing.com/qt4-qtruby-tutorial/">
+<link rel="next" href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_02">
+<!-- google_ad_section_end -->
+</head>
+<body>
+<div class="page">
+<!-- google_ad_section_start(weight=ignore) -->
+<div class="navPrev">&nbsp;</div>
+<div class="navContents">&nbsp;[<a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/">Contents</a>]&nbsp;</div>
+<div class="navNext">[Next: <a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_02">Chapter 2</a>]&nbsp;</div>
+<!-- google_ad_section_end -->
+<div class="content">
+<h1 class="title">Qt<sup>®</sup>4 Tutorial for the Ruby <br>Programming Language</h1>
+<!-- google_ad_section_start(weight=ignore) --><h2 class="subtitle">Chapter 1: Hello World!</h2><!-- google_ad_section_end -->
+<div class="center"><img src="./Qt®4 Tutorial for the Ruby Programming Language_files/t1.png" alt="Screenshot: Hello World!" width="108" height="62"></div>
+<br>
+Files:
+<ul>
+<li><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/tutorial/t1/t1.rb">t1.rb</a></li>
+</ul>
+<h3>Overview</h3>
+
+<p>
+This first program is a simple "Hello world" example. 
+It contains only the bare minimum you need to get a Qt application up and running. 
+The picture above is a screenshot of this program.
+</p>
+
+<p>
+Here's the complete source code for the application:
+</p>
+
+<pre class="code">require 'Qt4'
+
+app = Qt::Application.new(ARGV)
+
+hello = Qt::PushButton.new('Hello World!')
+hello.resize(100, 30)
+hello.show()
+
+app.exec()
+</pre>
+
+<h3>Intro</h3>
+
+<p>
+The top level in a QtRuby application usually only needs to perform some kind of initialization and then pass control to the Qt library,
+which then tells the program about the user's actions via events.
+</p>
+
+<p>
+There has to be exactly one <a href="http://doc.trolltech.com/4.2/qapplication.html">Qt::Application</a> object in every GUI application that uses Qt. 
+<a href="http://doc.trolltech.com/4.2/qapplication.html">Qt::Application</a> manages various application-wide resources, such as the default font and cursor.
+</p>
+
+<p>
+<a href="http://doc.trolltech.com/4.2/qpushbutton.html">Qt::PushButton</a> is a GUI push button that the user can press and release. 
+It manages its own look and feel, like every other <a href="http://doc.trolltech.com/4.2/qwidget.html">Qt::Widget</a>.
+A widget is a user interface object that can process user input and draw graphics. 
+The programmer can change both the overall look and feel and 
+many minor properties of it (such as color), as well as the widget's content. 
+A <a href="http://doc.trolltech.com/4.2/qpushbutton.html">Qt::PushButton</a> can show either text or a <a href="http://doc.trolltech.com/4.2/qicon.html">Qt::Icon</a>.
+</p>
+
+<h3>Line by Line Walkthrough</h3>
+
+<pre class="code">require 'Qt4'
+</pre>
+
+<p>
+This line loads the QtRuby extension.
+</p>
+
+<pre class="code">app = Qt::Application.new(ARGV)
+</pre>
+
+<p>
+<code>app</code> is this program's <a href="http://doc.trolltech.com/4.2/qapplication.html">Qt::Application</a> instance. It is created here. 
+We pass <code>ARGV</code> to the <a href="http://doc.trolltech.com/4.2/qapplication.html">Qt::Application</a> constructor
+so that it can process certain standard command-line arguments (such as <code>-display</code> under X11). 
+All command-line arguments recognized by Qt are removed from <code>ARGV</code>. 
+</p>
+
+<p>
+<strong>Note:</strong> It is essential that the <a href="http://doc.trolltech.com/4.2/qapplication.html">Qt::Application</a> object be created before any window-system parts of Qt are used.
+</p>
+
+<pre class="code">hello = Qt::PushButton.new('Hello World!')
+</pre>
+
+<p>
+Here, after the <a href="http://doc.trolltech.com/4.2/qapplication.html">Qt::Application</a>, comes the first window-system code: A push button is created.
+</p>
+
+<p>
+The button is set up to display the text "Hello world!". 
+Because we don't specify a parent window (as second argument to the 
+<a href="http://doc.trolltech.com/4.2/qpushbutton.html">Qt::PushButton</a> constructor), 
+the button will be a window of its own, with its own window frame and title bar.
+</p>
+
+<pre class="code">hello.resize(100, 30)
+</pre>
+
+<p>
+The button is set up to be 100 pixels wide and 30 pixels high 
+(excluding the window frame, which is provided by the windowing system). 
+We could call <a href="http://doc.trolltech.com/4.2/qwidget.html#pos-prop">Qt::Widget::move()</a> to assign a specific screen position to the widget, 
+but instead we let the windowing system choose a position.
+</p>
+
+<pre class="code">hello.show()
+</pre>
+
+<p>
+A widget is never visible when you create it. You must call <a href="http://doc.trolltech.com/4.2/qwidget.html#show">Qt::Widget::show()</a> to make it visible.
+</p>
+
+<pre class="code">app.exec()
+</pre>
+
+<p>
+This is where our program passes control to Qt. 
+<a href="http://doc.trolltech.com/4.2/qcoreapplication.html#exec">Qt::CoreApplication::exec()</a> will return when the application exits. 
+(<a href="http://doc.trolltech.com/4.2/qcoreapplication.html">Qt::CoreApplication</a> is <a href="http://doc.trolltech.com/4.2/qapplication.html">Qt::Application</a>'s base class. 
+It implements <a href="http://doc.trolltech.com/4.2/qapplication.html">Qt::Application</a>'s core, non-GUI functionality and can be used when developing non-GUI applications.)
+</p>
+
+<p>
+In <a href="http://doc.trolltech.com/4.2/qcoreapplication.html#exec">Qt::CoreApplication::exec()</a>, Qt receives and processes user and system events and passes these on to the appropriate widgets.
+</p>
+
+<p>
+You should now try to run this program.
+</p>
+
+<h3>Running the Application</h3>
+
+<p>
+When you run the application, you will see a small window filled with a single button, and on it you can read the famous words: "Hello world!"
+</p>
+
+<!-- google_ad_section_start(weight=ignore) --><h3>Exercises</h3><!-- google_ad_section_end -->
+
+<p>
+Try to resize the window. Click the button. If you're running X11, 
+try running the program with the <code>-geometry</code> option (for example, <code>-geometry 100x200+10+20</code>).
+</p>
+</div>
+<!-- google_ad_section_start(weight=ignore) -->
+<div class="navPrev">&nbsp;</div>
+<div class="navContents">&nbsp;[<a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/">Contents</a>]&nbsp;</div>
+<div class="navNext">[Next: <a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_02">Chapter 2</a>]&nbsp;</div>
+<!-- google_ad_section_end -->
+<!-- google_ad_section_start(weight=ignore) -->
+<hr><div class="legal_link"><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/legal">Legal Notice</a>&nbsp;</div>
+<div class="contact_link"><a href="mailto:qt-tutorial@darshancomputing.com">Contact Me</a></div>
+<!-- google_ad_section_end -->
+<div class="force_clear"></div>
+</div>
+
+<p style="clear: both">
+</p><p style="margin-bottom: 0px;">
+  <a href="http://validator.w3.org/check?uri=referer"><img src="./Qt®4 Tutorial for the Ruby Programming Language_files/valid-xhtml10.png" alt="Valid XHTML 1.0!" height="31" width="88"></a>
+  <a href="http://jigsaw.w3.org/css-validator/check/referer"><img src="./Qt®4 Tutorial for the Ruby Programming Language_files/vcss.png" alt="Valid CSS!" height="31" width="88"></a>
+</p>
+
+<p style="margin-top: 10px; margin-bottom: 0px;">
+This page was last generated Sun Dec 03 14:40:27 -0800 2006
+</p>
+<script type="text/javascript">/* <![CDATA[ */(function(d,s,a,i,j,r,l,m,t){try{l=d.getElementsByTagName('a');t=d.createElement('textarea');for(i=0;l.length-i;i++){try{a=l[i].href;s=a.indexOf('/cdn-cgi/l/email-protection');m=a.length;if(a&&s>-1&&m>28){j=28+s;s='';if(j<m){r='0x'+a.substr(j,2)|0;for(j+=2;j<m&&a.charAt(j)!='X';j+=2)s+='%'+('0'+('0x'+a.substr(j,2)^r).toString(16)).slice(-2);j++;s=decodeURIComponent(s)+a.substr(j,m-j)}t.innerHTML=s.replace(/</g,'&lt;').replace(/>/g,'&gt;');l[i].href='mailto:'+t.value}}catch(e){}}}catch(e){}})(document);/* ]]> */</script>
+
+</body></html>

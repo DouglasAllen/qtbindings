@@ -1,0 +1,428 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!-- saved from url=(0063)https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_13 -->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><head profile="http://www.w3.org/2005/10/profile"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Qt®4 Tutorial for the Ruby Programming Language</title>
+
+<link rel="stylesheet" href="./Qt®4 Tutorial for the Ruby Programming Language_files/default.css" type="text/css">
+<link rel="icon" type="image/png" href="https://www.darshancomputing.com/favicon.png">
+<!-- google_ad_section_start(weight=ignore) -->
+<link rel="start" href="https://www.darshancomputing.com/qt4-qtruby-tutorial/">
+<link rel="next" href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_14">
+<link rel="prev" href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_12">
+<!-- google_ad_section_end -->
+</head>
+<body>
+<div class="page">
+<!-- google_ad_section_start(weight=ignore) -->
+<div class="navPrev">&nbsp;[Prev: <a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_12">Chapter 12</a>]</div>
+<div class="navContents">&nbsp;[<a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/">Contents</a>]&nbsp;</div>
+<div class="navNext">[Next: <a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_14">Chapter 14</a>]&nbsp;</div>
+<!-- google_ad_section_end -->
+<div class="content">
+<h1 class="title">Qt<sup>®</sup>4 Tutorial for the Ruby <br>Programming Language</h1>
+<!-- google_ad_section_start(weight=ignore) --><h2 class="subtitle">Chapter 13: Game Over</h2><!-- google_ad_section_end -->
+<div class="center"><img src="./Qt®4 Tutorial for the Ruby Programming Language_files/t13.png" alt="Screenshot: Game Over" width="516" height="386"></div>
+<br>
+Files:
+<ul>
+<li><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/tutorial/t13/cannon.rb">cannon.rb</a></li>
+<li><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/tutorial/t13/t13.rb">t13.rb</a></li>
+<li><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/tutorial/t13/gamebrd.rb">gamebrd.rb</a></li>
+<li><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/tutorial/t13/lcdrange.rb">lcdrange.rb</a></li>
+</ul>
+<h3>Overview</h3>
+
+<p>
+In this example we start to approach a real playable game with a score.
+</p>
+
+<p>
+We give <code>MyWidget</code> a new name (<code>GameBoard</code>), add some slots,
+and move it to <code>gamebrd.rb</code>
+</p>
+
+<p>
+The <code>CannonField</code> now has a game over state.
+</p>
+
+<p>
+The layout problems in <code>LCDRange</code> are fixed.
+</p>
+
+<h3>Line by Line Walkthrough</h3>
+
+<h4><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/tutorial/t13/lcdrange.rb">lcdrange.rb</a></h4>
+
+<pre class="code">    @label.setSizePolicy(Qt::SizePolicy::Preferred, Qt::SizePolicy::Fixed)
+</pre>
+
+<p>
+We set the size policy of the <a href="http://doc.trolltech.com/4.2/qlabel.html">Qt::Label</a> to (<a href="http://doc.trolltech.com/4.2/qsizepolicy.html#Policy-enum">Qt::SizePolicy::Preferred</a>, <a href="http://doc.trolltech.com/4.2/qsizepolicy.html#Policy-enum">Qt::SizePolicy::Fixed</a>). The vertical component ensures that the label won't stretch or shrink vertically; it will stay at its optimal size (its <a href="http://doc.trolltech.com/4.2/qwidget.html#sizeHint-prop">QWidget::sizeHint()</a>). This solves the layout problems observed in Chapter 12.
+</p>
+
+<h4><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/tutorial/t13/cannon.rb">cannon.rb</a></h4>
+
+<p>
+The <code>CannonField</code> now has a game over state and a few new functions.
+</p>
+
+<pre class="code">  signals 'canShoot(bool)'
+</pre>
+
+<p>
+This new signal indicates that the <code>CannonField</code> is in a state where 
+the <code>shoot()</code> slot makes sense. 
+We'll use it below to enable or disable the <b>Shoot</b> button.
+</p>
+
+<pre class="code">    @gameEnded = false
+</pre>
+
+<p>
+This variable contains the game state; <code>true</code> means that the game is 
+over, and <code>false</code> means that a game is going on.
+Initially, the game is not over (luckily for the player :-).
+</p>
+
+<pre class="code">  def shoot()
+    if isShooting()
+      return
+    end
+
+    @timerCount = 0
+    @shootAngle = @currentAngle
+    @shootForce = @currentForce
+    @autoShootTimer.start(5)
+    emit canShoot(false)
+  end
+</pre>
+
+<p>
+We added a new <code>isShooting()</code> function, so <code>shoot()</code> 
+uses it instead of testing directly. 
+Also, shoot tells the world that the <code>CannonField</code> cannot shoot now.
+</p>
+
+<pre class="code">  def setGameOver()
+    if @gameEnded
+      return
+    end
+
+    if isShooting()
+      @autoShootTimer.stop()
+    end
+
+    @gameEnded = true
+    update()
+  end
+</pre>
+
+<p>
+This slot ends the game. 
+It must be called from outside <code>CannonField</code>, 
+because this widget does not know when to end the game. 
+This is an important design principle in component programming. 
+We choose to make the component as flexible as possible to make it usable with 
+different rules (for example, a multi-player version of this in which the 
+first player to hit ten times wins could use the <code>CannonField</code> unchanged).
+</p>
+
+<p>
+If the game has already been ended we return immediately. 
+If a game is going on we stop the shot, set the game over flag, and repaint the entire widget.
+</p>
+
+<pre class="code">  def restartGame()
+    if isShooting()
+      @autoShootTimer.stop()
+    end
+
+    @gameEnded = false
+
+    update()
+    emit canShoot(true)
+  end
+</pre>
+
+<p>
+This slot starts a new game. If a shot is in the air, we stop shooting. 
+We then reset the <code>gameEnded</code> variable and repaint the widget.
+</p>
+
+<p>
+<code>moveShot()</code> too emits the new <code>canShoot(true)</code> signal 
+at the same time as either <code>hit()</code> or <code>miss()</code>.
+</p>
+
+<p>
+Modifications in CannonField::paintEvent():
+</p>
+
+<pre class="code">  def paintEvent(event)
+    painter = Qt::Painter.new(self)
+
+    if @gameEnded
+      painter.setPen(Qt::black)
+      painter.setFont(Qt::Font.new( "Courier", 48, Qt::Font::Bold))
+      painter.drawText(rect(), Qt::AlignCenter, tr("Game Over"))
+    end
+</pre>
+
+<p>
+The paint event has been enhanced to display the text "Game Over" 
+if the game is over, i.e., <code>gameEnded</code> is <code>true</code>. 
+We don't bother to check the update rectangle here because speed 
+is not critical when the game is over.
+</p>
+
+<p>
+To draw the text we first set a black pen; the pen color is used when drawing text. 
+Next we choose a 48 point bold font from the Courier family. 
+Finally we draw the text centered in the widget's rectangle. 
+Unfortunately, on some systems (especially X servers with Unicode fonts) 
+it can take a while to load such a large font. 
+Because Qt caches fonts, you will notice this only the first time the font is used.
+</p>
+
+<pre class="code">    paintCannon(painter)
+
+    if isShooting()
+      paintShot(painter)
+    end        
+
+    unless @gameEnded
+      paintTarget(painter)
+    end
+
+    painter.end()
+  end
+</pre>
+
+<p>
+We draw the shot only when shooting and the target only when playing (that is, when the game is not ended).
+</p>
+
+<h4><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/tutorial/t13/gamebrd.rb">gamebrd.rb</a></h4>
+
+<p>
+This file is new. It contains the <code>GameBoard</code> class, which was last seen as <code>MyWidget</code>.
+</p>
+
+<pre class="code">  slots 'fire()', 'hit()', 'missed()', 'newGame()'
+</pre>
+
+<p>
+We have now added four slots.
+</p>
+
+<p>
+We have also made some changes in the <code>GameBoard</code> constructor.
+</p>
+
+<pre class="code">    @cannonField = CannonField.new()
+</pre>
+
+<p>
+<code>@cannonField</code> is now a member variable, so we carefully change the constructor to use it.
+</p>
+
+<pre class="code">    connect(@cannonField, SIGNAL('hit()'),
+            self, SLOT('hit()'))
+    connect(@cannonField, SIGNAL('missed()'),
+            self, SLOT('missed()'))
+</pre>
+
+<p>
+This time we want to do something when the shot has hit or missed the target. 
+Thus we connect the <code>hit()</code> and <code>missed()</code> signals of the 
+<code>CannonField</code> to two protected slots with the same names in this class.
+</p>
+
+<pre class="code">    connect(shoot, SIGNAL('clicked()'), self, SLOT('fire()') )
+</pre>
+
+<p>
+Previously we connected the <b>Shoot</b> button's <code>clicked()</code> signal
+ directly to the <code>CannonField</code>'s <code>shoot()</code> slot. 
+This time we want to keep track of the number of shots fired, 
+so we connect it to a slot in this class instead.
+</p>
+
+<p>
+Notice how easy it is to change the behavior of a program when 
+you are working with self-contained components.
+</p>
+
+<pre class="code">    connect(@cannonField, SIGNAL('canShoot(bool)'),
+            shoot, SLOT('setEnabled(bool)'))
+</pre>
+
+<p>
+We also use the <code>cannonField</code>'s <code>canShoot()</code> signal to 
+enable or disable the <b>Shoot</b> button appropriately.
+</p>
+
+<pre class="code">    restart = Qt::PushButton.new(tr('&amp;New Game'))
+    restart.setFont(Qt::Font.new('Times', 18, Qt::Font::Bold))
+
+    connect(restart, SIGNAL('clicked()'), self, SLOT('newGame()'))
+</pre>
+
+<p>
+We create, set up, and connect the <b>New Game</b> button as we have done with the other buttons. 
+Clicking this button will activate the <code>newGame()</code> slot in this widget.
+</p>
+
+<pre class="code">    @hits = Qt::LCDNumber.new(2)
+    @shotsLeft = Qt::LCDNumber.new(2)
+    hitsLabel = Qt::Label.new(tr('HITS'))
+    shotsLeftLabel = Qt::Label.new(tr('SHOTS LEFT'))
+</pre>
+
+<p>
+We create four new widgets, to display the number of hits and shots left.
+</p>
+
+<pre class="code">    topLayout = Qt::HBoxLayout.new()
+    topLayout.addWidget(shoot)
+    topLayout.addWidget(@hits)
+    topLayout.addWidget(hitsLabel)
+    topLayout.addWidget(@shotsLeft)
+    topLayout.addWidget(shotsLeftLabel)
+    topLayout.addStretch(1)
+    topLayout.addWidget(restart)
+</pre>
+
+<p>
+The top-right cell of the <a href="http://doc.trolltech.com/4.2/qgridlayout.html">Qt::GridLayout</a> is starting to get crowded. 
+We put a stretch just to the left of the <b>New Game</b> button to 
+ensure that this button will always appear on the right side of the window.
+</p>
+
+<pre class="code">    newGame()
+</pre>
+
+<p>
+We're all done constructing the <code>GameBoard</code>, so we start it all using <code>newGame()</code>. 
+Although <code>newGame()</code> is a slot, it can also be used as an ordinary function.
+</p>
+
+<pre class="code">  def fire()
+    if @cannonField.gameOver() || @cannonField.isShooting()
+      return
+    end
+
+    @shotsLeft.display(@shotsLeft.intValue() - 1)
+    @cannonField.shoot()
+  en
+</pre>
+
+<p>
+This function fires a shot. If the game is over or if there is a shot in the air, 
+we return immediately. We decrement the number of shots left and tell the cannon to shoot.
+</p>
+
+<pre class="code">  def hit()
+    @hits.display(@hits.intValue() + 1)
+
+    if @shotsLeft.intValue() == 0
+      @cannonField.setGameOver()
+    else
+      @cannonField.newTarget()
+    end
+  end
+</pre>
+
+<p>
+This slot is activated when a shot has hit the target. 
+We increment the number of hits. 
+If there are no shots left, the game is over. 
+Otherwise, we make the <code>CannonField</code> generate a new target.
+</p>
+
+<pre class="code">  def missed()
+    if @shotsLeft.intValue() == 0
+      @cannonField.setGameOver()
+    end
+  end
+</pre>
+
+<p>
+This slot is activated when a shot has missed the target. 
+If there are no shots left, the game is over.
+</p>
+
+<pre class="code">  def newGame()
+    @shotsLeft.display(15)
+    @hits.display(0)
+    @cannonField.restartGame()
+    @cannonField.newTarget()
+  end
+</pre>
+
+<p>
+This slot is activated when the user clicks the <b>New Game</b> button.
+It is also called from the constructor. 
+First it sets the number of shots to 15.
+ Note that this is the only place in the program where we set the number of shots. 
+Change it to whatever you like to change the game rules. 
+Next we reset the number of hits, restart the game, and generate a new target.
+</p>
+
+<h4><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/tutorial/t13/t13.rb">t13.rb</a></h4>
+
+<p>
+This file has just been on a diet. <code>MyWidget</code> is gone, 
+and the only thing left is the <code>main()</code> function, 
+unchanged except for the name change.
+</p>
+
+<h3>Running the Application</h3>
+
+<p>
+The cannon can shoot at a target; a new target is automatically created when one has been hit.
+</p>
+
+<p>
+Hits and shots left are displayed and the program keeps track of them. 
+The game can end, and there's a button to start a new game.
+</p>
+
+<!-- google_ad_section_start(weight=ignore) --><h3>Exercises</h3><!-- google_ad_section_end -->
+
+<p>
+Add a random wind factor and show it to the user.
+</p>
+
+<p>
+Make some splatter effects when the shot hits the target.
+</p>
+
+<p>
+Implement multiple targets.
+</p>
+</div>
+<!-- google_ad_section_start(weight=ignore) -->
+<div class="navPrev">&nbsp;[Prev: <a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_12">Chapter 12</a>]</div>
+<div class="navContents">&nbsp;[<a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/">Contents</a>]&nbsp;</div>
+<div class="navNext">[Next: <a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_14">Chapter 14</a>]&nbsp;</div>
+<!-- google_ad_section_end -->
+<!-- google_ad_section_start(weight=ignore) -->
+<hr><div class="legal_link"><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/legal">Legal Notice</a>&nbsp;</div>
+<div class="contact_link"><a href="mailto:qt-tutorial@darshancomputing.com">Contact Me</a></div>
+<!-- google_ad_section_end -->
+<div class="force_clear"></div>
+</div>
+
+<p style="clear: both">
+</p><p style="margin-bottom: 0px;">
+  <a href="http://validator.w3.org/check?uri=referer"><img src="./Qt®4 Tutorial for the Ruby Programming Language_files/valid-xhtml10.png" alt="Valid XHTML 1.0!" height="31" width="88"></a>
+  <a href="http://jigsaw.w3.org/css-validator/check/referer"><img src="./Qt®4 Tutorial for the Ruby Programming Language_files/vcss.png" alt="Valid CSS!" height="31" width="88"></a>
+</p>
+
+<p style="margin-top: 10px; margin-bottom: 0px;">
+This page was last generated Sun Dec 03 14:40:27 -0800 2006
+</p>
+<script type="text/javascript">/* <![CDATA[ */(function(d,s,a,i,j,r,l,m,t){try{l=d.getElementsByTagName('a');t=d.createElement('textarea');for(i=0;l.length-i;i++){try{a=l[i].href;s=a.indexOf('/cdn-cgi/l/email-protection');m=a.length;if(a&&s>-1&&m>28){j=28+s;s='';if(j<m){r='0x'+a.substr(j,2)|0;for(j+=2;j<m&&a.charAt(j)!='X';j+=2)s+='%'+('0'+('0x'+a.substr(j,2)^r).toString(16)).slice(-2);j++;s=decodeURIComponent(s)+a.substr(j,m-j)}t.innerHTML=s.replace(/</g,'&lt;').replace(/>/g,'&gt;');l[i].href='mailto:'+t.value}}catch(e){}}}catch(e){}})(document);/* ]]> */</script>
+
+</body></html>

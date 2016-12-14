@@ -1,0 +1,163 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!-- saved from url=(0063)https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_09 -->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><head profile="http://www.w3.org/2005/10/profile"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Qt®4 Tutorial for the Ruby Programming Language</title>
+
+<link rel="stylesheet" href="./Qt®4 Tutorial for the Ruby Programming Language_files/default.css" type="text/css">
+<link rel="icon" type="image/png" href="https://www.darshancomputing.com/favicon.png">
+<!-- google_ad_section_start(weight=ignore) -->
+<link rel="start" href="https://www.darshancomputing.com/qt4-qtruby-tutorial/">
+<link rel="next" href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_10">
+<link rel="prev" href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_08">
+<!-- google_ad_section_end -->
+</head>
+<body>
+<div class="page">
+<!-- google_ad_section_start(weight=ignore) -->
+<div class="navPrev">&nbsp;[Prev: <a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_08">Chapter 8</a>]</div>
+<div class="navContents">&nbsp;[<a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/">Contents</a>]&nbsp;</div>
+<div class="navNext">[Next: <a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_10">Chapter 10</a>]&nbsp;</div>
+<!-- google_ad_section_end -->
+<div class="content">
+<h1 class="title">Qt<sup>®</sup>4 Tutorial for the Ruby <br>Programming Language</h1>
+<!-- google_ad_section_start(weight=ignore) --><h2 class="subtitle">Chapter 9: With Cannon You Can</h2><!-- google_ad_section_end -->
+<div class="center"><img src="./Qt®4 Tutorial for the Ruby Programming Language_files/t9.png" alt="Screenshot: With Cannon You Can" width="508" height="386"></div>
+<br>
+Files:
+<ul>
+<li><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/tutorial/t9/t9.rb">t9.rb</a></li>
+<li><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/tutorial/t9/cannon.rb">cannon.rb</a></li>
+<li><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/tutorial/t9/lcdrange.rb">lcdrange.rb</a></li>
+</ul>
+<h3>Overview</h3>
+
+<p>
+In this example we become graphic by drawing a cute little blue cannon. 
+Only cannon.rb differs from the previous chapter.
+</p>
+
+<h3>Line by Line Walkthrough</h3>
+
+<h4><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/tutorial/t9/cannon.rb">cannon.rb</a></h4>
+
+<pre class="code">  def paintEvent(event)
+    painter = Qt::Painter.new(self)
+</pre>
+
+<p>
+We'll now start to use <a href="http://doc.trolltech.com/4.2/qpainter.html">Qt::Painter</a> in earnest. We create a painter that operates on this widget.
+</p>
+
+<pre class="code">    painter.setPen(Qt::NoPen)
+</pre>
+
+<p>
+The edges of what <a href="http://doc.trolltech.com/4.2/qpainter.html">Qt::Painter</a> draws are drawn using the pen. 
+Here we set it to <a href="http://doc.trolltech.com/4.2/qt.html#PenStyle-enum">Qt::NoPen</a>, meaning that there will be no special edge when we draw something.
+</p>
+
+<pre class="code">    painter.setBrush(Qt::Brush.new(Qt::blue))
+</pre>
+
+<p>
+When <a href="http://doc.trolltech.com/4.2/qpainter.html">Qt::Painter</a> fills a rectangle, a circle, or whatever, it fills the shape using its brush. 
+Here we set it to use a solid blue brush. (We could also use a pattern.) 
+The blue brush will go all the way to the edges of the things we draw.
+</p>
+
+<pre class="code">    painter.translate(0, rect().height())
+</pre>
+
+<p>
+The <a href="http://doc.trolltech.com/4.2/qpainter.html#translate">Qt::Painter::translate()</a> function translates the coordinate system of the <a href="http://doc.trolltech.com/4.2/qpainter.html">Qt::Painter</a> (i.e., it moves it by an offset). 
+Here we set the (0, 0) point to the bottom-left corner of the widget. 
+The x and y directions remain unchanged, i.e., all the y coordinates inside the widget are now negative. 
+(See <a href="http://doc.trolltech.com/4.2/coordsys.html">The Coordinate System</a> for more information about Qt's coordinate system.)
+</p>
+
+<pre class="code">    painter.drawPie(Qt::Rect.new(-35, -35, 70, 70), 0, 90 * 16)
+</pre>
+
+<p>
+The <a href="http://doc.trolltech.com/4.2/qpainter.html#drawPie">Qt::Painter::drawPie()</a> function draws a pie shape inside the specified rectangle using a start angle and an arc length. 
+The angles are specified in sixteenths of a degree. Zero degrees is at the 3 o'clock position. 
+The drawing direction is counter-clockwise. Here we draw a quarter of a circle in the bottom-left corner of the widget. 
+The pie is filled with blue and has no outline.
+</p>
+
+<pre class="code">    painter.rotate(-@currentAngle)
+</pre>
+
+<p>
+The <a href="http://doc.trolltech.com/4.2/qpainter.html#rotate">Qt::Painter::rotate()</a> function rotates the coordinate system of the <a href="http://doc.trolltech.com/4.2/qpainter.html">Qt::Painter</a> around the origin. 
+The rotation argument is given in degrees (not given in sixteenths of a degree as above) and clockwise. 
+Here we rotate the coordinate system <code>@currentAngle</code> degrees counter-clockwise.
+</p>
+
+<pre class="code">    painter.drawRect(Qt::Rect.new(30, -5, 20, 10))
+</pre>
+
+<p>
+The <a href="http://doc.trolltech.com/4.2/qpainter.html#drawRect">Qt::Painter::drawRect()</a> function draws the specified rectangle. Here we draw the barrel of the cannon.
+</p>
+
+<p>
+It can often be difficult to envision the resulting drawing when the coordinate system has been transformed (
+translated, rotated, scaled, or sheared) as above.
+</p>
+
+<p>
+In this case the coordinate system is first translated and then rotated. 
+If the rectangle <a href="http://doc.trolltech.com/4.2/qrect.html">Qt::Rect</a>.new(30, -5, 20, 10) had been drawn in the translated coordinate system, it would have looked like this:
+</p>
+
+<p class="center">
+<img src="./Qt®4 Tutorial for the Ruby Programming Language_files/t9_1.png" alt="incorrect" width="54" height="54">
+</p>
+
+<p>
+Note that the rectangle is clipped by the border of the <code>CannonField</code> widget. 
+When we rotate the coordinate system, for instance 60 degrees, the rectangle will be rotated around (0, 0), 
+which is the bottom-left corner because we have translated the coordinate system. The result looks like this:
+</p>
+
+<p class="center">
+<img src="./Qt®4 Tutorial for the Ruby Programming Language_files/t9_2.png" alt="correct" width="54" height="54">
+</p>
+
+<h3>Running the Application</h3>
+
+<p>
+When the slider is operated the angle of the drawn cannon changes accordingly.
+</p>
+
+<!-- google_ad_section_start(weight=ignore) --><h3>Exercises</h3><!-- google_ad_section_end -->
+
+<p>
+Set a different pen instead of <a href="http://doc.trolltech.com/4.2/qt.html#PenStyle-enum">Qt::NoPen</a>. Set a patterned brush.
+</p>
+</div>
+<!-- google_ad_section_start(weight=ignore) -->
+<div class="navPrev">&nbsp;[Prev: <a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_08">Chapter 8</a>]</div>
+<div class="navContents">&nbsp;[<a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/">Contents</a>]&nbsp;</div>
+<div class="navNext">[Next: <a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_10">Chapter 10</a>]&nbsp;</div>
+<!-- google_ad_section_end -->
+<!-- google_ad_section_start(weight=ignore) -->
+<hr><div class="legal_link"><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/legal">Legal Notice</a>&nbsp;</div>
+<div class="contact_link"><a href="mailto:qt-tutorial@darshancomputing.com">Contact Me</a></div>
+<!-- google_ad_section_end -->
+<div class="force_clear"></div>
+</div>
+
+<p style="clear: both">
+</p><p style="margin-bottom: 0px;">
+  <a href="http://validator.w3.org/check?uri=referer"><img src="./Qt®4 Tutorial for the Ruby Programming Language_files/valid-xhtml10.png" alt="Valid XHTML 1.0!" height="31" width="88"></a>
+  <a href="http://jigsaw.w3.org/css-validator/check/referer"><img src="./Qt®4 Tutorial for the Ruby Programming Language_files/vcss.png" alt="Valid CSS!" height="31" width="88"></a>
+</p>
+
+<p style="margin-top: 10px; margin-bottom: 0px;">
+This page was last generated Sun Dec 03 14:40:27 -0800 2006
+</p>
+<script type="text/javascript">/* <![CDATA[ */(function(d,s,a,i,j,r,l,m,t){try{l=d.getElementsByTagName('a');t=d.createElement('textarea');for(i=0;l.length-i;i++){try{a=l[i].href;s=a.indexOf('/cdn-cgi/l/email-protection');m=a.length;if(a&&s>-1&&m>28){j=28+s;s='';if(j<m){r='0x'+a.substr(j,2)|0;for(j+=2;j<m&&a.charAt(j)!='X';j+=2)s+='%'+('0'+('0x'+a.substr(j,2)^r).toString(16)).slice(-2);j++;s=decodeURIComponent(s)+a.substr(j,m-j)}t.innerHTML=s.replace(/</g,'&lt;').replace(/>/g,'&gt;');l[i].href='mailto:'+t.value}}catch(e){}}}catch(e){}})(document);/* ]]> */</script>
+
+</body></html>

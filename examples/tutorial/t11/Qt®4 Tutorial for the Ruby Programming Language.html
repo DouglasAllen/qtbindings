@@ -1,0 +1,284 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!-- saved from url=(0063)https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_11 -->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><head profile="http://www.w3.org/2005/10/profile"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Qt®4 Tutorial for the Ruby Programming Language</title>
+
+<link rel="stylesheet" href="./Qt®4 Tutorial for the Ruby Programming Language_files/default.css" type="text/css">
+<link rel="icon" type="image/png" href="https://www.darshancomputing.com/favicon.png">
+<!-- google_ad_section_start(weight=ignore) -->
+<link rel="start" href="https://www.darshancomputing.com/qt4-qtruby-tutorial/">
+<link rel="next" href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_12">
+<link rel="prev" href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_10">
+<!-- google_ad_section_end -->
+</head>
+<body>
+<div class="page">
+<!-- google_ad_section_start(weight=ignore) -->
+<div class="navPrev">&nbsp;[Prev: <a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_10">Chapter 10</a>]</div>
+<div class="navContents">&nbsp;[<a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/">Contents</a>]&nbsp;</div>
+<div class="navNext">[Next: <a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_12">Chapter 12</a>]&nbsp;</div>
+<!-- google_ad_section_end -->
+<div class="content">
+<h1 class="title">Qt<sup>®</sup>4 Tutorial for the Ruby <br>Programming Language</h1>
+<!-- google_ad_section_start(weight=ignore) --><h2 class="subtitle">Chapter 11: Giving It a Shot</h2><!-- google_ad_section_end -->
+<div class="center"><img src="./Qt®4 Tutorial for the Ruby Programming Language_files/t11.png" alt="Screenshot: Giving It a Shot" width="508" height="386"></div>
+<br>
+Files:
+<ul>
+<li><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/tutorial/t11/t11.rb">t11.rb</a></li>
+<li><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/tutorial/t11/cannon.rb">cannon.rb</a></li>
+<li><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/tutorial/t11/lcdrange.rb">lcdrange.rb</a></li>
+</ul>
+<h3>Overview</h3>
+
+<p>
+In this example we introduce a timer to implement animated shooting.
+</p>
+
+<h3>Line by Line Walkthrough</h3>
+
+<h4><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/tutorial/t11/cannon.rb">cannon.rb</a></h4>
+
+<p>
+The <code>CannonField</code> now has shooting capabilities.
+</p>
+
+<pre class="code">include Math
+</pre>
+
+<p>
+We include <code>Math</code> because we need the <code>sin()</code> and <code>cos()</code> functions.
+</p>
+
+<pre class="code">    @timerCount = 0
+
+    @autoShootTimer = Qt::Timer.new(self)
+    connect(@autoShootTimer, SIGNAL('timeout()'),
+             self, SLOT('moveShot()'))
+
+    @shootAngle = 0
+    @shootForce = 0
+</pre>
+
+<p>
+We initialize our new private variables and connect the <a href="http://doc.trolltech.com/4.2/qtimer.html#timeout">Qt::Timer::timeout()</a> 
+signal to our <code>moveShot()</code> slot. 
+We'll move the shot every time the timer times out.
+</p>
+
+<p>
+The <code>timerCount</code> keeps track of the time passed since the shot was fired. 
+The <code>shootAngle</code> is the cannon angle and <code>shootForce</code> is the cannon force when the shot was fired.
+</p>
+
+<pre class="code">  def shoot()
+    if @autoShootTimer.isActive()
+      return
+    end;
+
+    @timerCount = 0
+    @shootAngle = @currentAngle
+    @shootForce = @currentForce
+    @autoShootTimer.start(5)
+  end
+</pre>
+
+<p>
+This function shoots a shot unless a shot is in the air. 
+The <code>timerCount</code> is reset to zero. 
+The <code>shootAngle</code> and <code>shootForce</code> 
+variables are set to the current cannon angle and force. 
+Finally, we start the timer.
+</p>
+
+<pre class="code">  def moveShot()
+    region = Qt::Region.new(shotRect())
+    @timerCount += 1
+
+    shotR = shotRect()
+
+    if shotR.x() &gt; width() || shotR.y() &gt; height()
+      @autoShootTimer.stop()
+    else
+      region = region.unite(Qt::Region.new(shotR))
+    end
+    update(region)
+  end
+</pre>
+
+<p>
+<code>moveShot()</code> is the slot that moves the shot, 
+called every 5 milliseconds when the <a href="http://doc.trolltech.com/4.2/qtimer.html">Qt::Timer</a> fires.
+</p>
+
+<p>
+Its tasks are to compute the new position,
+ update the screen with the shot in the new position, 
+and if necessary, stop the timer.
+</p>
+
+<p>
+First we make a <a href="http://doc.trolltech.com/4.2/qregion.html">Qt::Region</a> that holds the old <code>shotRect()</code>. 
+A <a href="http://doc.trolltech.com/4.2/qregion.html">Qt::Region</a> is capable of holding any sort of region, 
+and we'll use it here to simplify the painting. 
+<code>shotRect()</code> returns the rectangle where the shot is now. 
+It is explained in detail later.
+</p>
+
+<p>
+Then we increment the <code>timerCount</code>, 
+which has the effect of moving the shot one step along its trajectory.
+</p>
+
+<p>
+Next we fetch the new shot rectangle.
+</p>
+
+<p>
+If the shot has moved beyond the right or bottom edge of the widget we stop the timer, 
+or we add the new <code>shotRect()</code> to the <a href="http://doc.trolltech.com/4.2/qregion.html">Qt::Region</a>.
+</p>
+
+<p>
+Finally, we repaint the <a href="http://doc.trolltech.com/4.2/qregion.html">Qt::Region</a>. 
+This will send a single paint event for just the one or two rectangles that need updating.
+</p>
+
+<pre class="code">  def paintEvent(event)
+    painter = Qt::Painter.new(self)
+
+    paintCannon(painter)
+    if @autoShootTimer.isActive()
+      paintShot(painter)
+    end
+
+    painter.end()
+  end
+</pre>
+
+<p>
+The paint event function has been simplified since the previous chapter. 
+Most of the logic has been moved to the new <code>paintShot()</code> and 
+<code>paintCannon()</code> functions.
+</p>
+
+<pre class="code">  def paintShot(painter)
+    painter.setPen(Qt::NoPen)
+    painter.setBrush(Qt::Brush.new(Qt::black))
+    painter.drawRect(shotRect())
+  end
+</pre>
+
+<p>
+This private function paints the shot by drawing a black filled rectangle.
+</p>
+
+<p>
+We leave out the implementation of <code>paintCannon()</code>; 
+it is the same as the <a href="http://doc.trolltech.com/4.2/qwidget.html#paintEvent">Qt::Widget::paintEvent()</a> reimplementation from the previous chapter.
+</p>
+
+<pre class="code">  def shotRect()
+    gravity = 4.0
+
+    time = @timerCount / 20.0
+    velocity = @shootForce
+    radians = @shootAngle * 3.14159265 / 180.0
+
+    velx = velocity * cos(radians)
+    vely = velocity * sin(radians)
+    x0 = (@barrelRect.right() + 5.0) * cos(radians)
+    y0 = (@barrelRect.right() + 5.0) * sin(radians)
+    x = x0 + velx * time
+    y = y0 + vely * time - 0.5 * gravity * time * time
+
+    result = Qt::Rect.new(0, 0, 6, 6)
+    result.moveCenter(Qt::Point.new(x.round, height() - 1 - y.round))
+    return result
+  end
+</pre>
+
+<p>
+This private function calculates the center point of the shot and 
+returns the enclosing rectangle of the shot. 
+It uses the initial cannon force and angle in addition to 
+<code>timerCount</code>, which increases as time passes.
+</p>
+
+<p>
+The formula used is the standard Newtonian formula for 
+frictionless movement in a gravity field. For simplicity, 
+we've chosen to disregard any Einsteinian effects.
+</p>
+
+<p>
+We calculate the center point in a coordinate system where 
+<i>y</i> coordinates increase upward. After we have calculated the center point, 
+we construct a <a href="http://doc.trolltech.com/4.2/qrect.html">Qt::Rect</a> with size 6 x 6 and move its center point to the point calculated above. 
+In the same operation we convert the point into the widget's coordinate system 
+(see <a href="http://doc.trolltech.com/4.2/coordsys.html">The Coordinate System</a>).
+</p>
+
+<h4><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/tutorial/t11/t11.rb">t11.rb</a></h4>
+
+<p>
+The only addition is the <b>Shoot</b> button.
+</p>
+
+<pre class="code">    shoot = Qt::PushButton.new(tr('&amp;Shoot'))
+    shoot.setFont(Qt::Font.new('Times', 18, Qt::Font::Bold))
+</pre>
+
+<p>
+In the constructor we create and set up the <b>Shoot</b> button 
+exactly like we did with the <b>Quit</b> button.
+</p>
+
+<pre class="code">    connect(shoot, SIGNAL('clicked()'), cannonField, SLOT('shoot()'))
+</pre>
+
+<p>
+Connects the <code>clicked()</code> signal of the <b>Shoot</b> button to 
+the <code>shoot()</code> slot of the <code>CannonField</code>.
+</p>
+
+<h3>Running the Application</h3>
+
+<p>
+The cannon can shoot, but there's nothing to shoot at.
+</p>
+
+<!-- google_ad_section_start(weight=ignore) --><h3>Exercises</h3><!-- google_ad_section_end -->
+
+<p>
+Make the shot a filled circle. [Hint: <a href="http://doc.trolltech.com/4.2/qpainter.html#drawEllipse">Qt::Painter::drawEllipse()</a> may help.]
+</p>
+
+<p>
+Change the color of the cannon when a shot is in the air.
+</p>
+</div>
+<!-- google_ad_section_start(weight=ignore) -->
+<div class="navPrev">&nbsp;[Prev: <a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_10">Chapter 10</a>]</div>
+<div class="navContents">&nbsp;[<a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/">Contents</a>]&nbsp;</div>
+<div class="navNext">[Next: <a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/chapter_12">Chapter 12</a>]&nbsp;</div>
+<!-- google_ad_section_end -->
+<!-- google_ad_section_start(weight=ignore) -->
+<hr><div class="legal_link"><a href="https://www.darshancomputing.com/qt4-qtruby-tutorial/legal">Legal Notice</a>&nbsp;</div>
+<div class="contact_link"><a href="mailto:qt-tutorial@darshancomputing.com">Contact Me</a></div>
+<!-- google_ad_section_end -->
+<div class="force_clear"></div>
+</div>
+
+<p style="clear: both">
+</p><p style="margin-bottom: 0px;">
+  <a href="http://validator.w3.org/check?uri=referer"><img src="./Qt®4 Tutorial for the Ruby Programming Language_files/valid-xhtml10.png" alt="Valid XHTML 1.0!" height="31" width="88"></a>
+  <a href="http://jigsaw.w3.org/css-validator/check/referer"><img src="./Qt®4 Tutorial for the Ruby Programming Language_files/vcss.png" alt="Valid CSS!" height="31" width="88"></a>
+</p>
+
+<p style="margin-top: 10px; margin-bottom: 0px;">
+This page was last generated Sun Dec 03 14:40:27 -0800 2006
+</p>
+<script type="text/javascript">/* <![CDATA[ */(function(d,s,a,i,j,r,l,m,t){try{l=d.getElementsByTagName('a');t=d.createElement('textarea');for(i=0;l.length-i;i++){try{a=l[i].href;s=a.indexOf('/cdn-cgi/l/email-protection');m=a.length;if(a&&s>-1&&m>28){j=28+s;s='';if(j<m){r='0x'+a.substr(j,2)|0;for(j+=2;j<m&&a.charAt(j)!='X';j+=2)s+='%'+('0'+('0x'+a.substr(j,2)^r).toString(16)).slice(-2);j++;s=decodeURIComponent(s)+a.substr(j,m-j)}t.innerHTML=s.replace(/</g,'&lt;').replace(/>/g,'&gt;');l[i].href='mailto:'+t.value}}catch(e){}}}catch(e){}})(document);/* ]]> */</script>
+
+</body></html>
