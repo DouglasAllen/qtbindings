@@ -27,7 +27,7 @@ class MyWidget < Qt::Widget
   def angle_display
     @angle = LCDRange.new(self)
     @angle.range = 5..70
-    @angle.setValue(60)
+    @angle.value = 60
     @angle.setFocus
   end
 
@@ -35,8 +35,8 @@ class MyWidget < Qt::Widget
     @cannon_field = CannonField.new(self)
 
     connect(@angle, SIGNAL('valueChanged(int)'),
-            @cannon_field, SLOT('setAngle(int)'))
-    connect(@cannon_field, SIGNAL('angleChanged(int)'),
+            @cannon_field, SLOT('set_angle(int)'))
+    connect(@cannon_field, SIGNAL('angle_changed(int)'),
             @angle, SLOT('setValue(int)'))
   end
 
